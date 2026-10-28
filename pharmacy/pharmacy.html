@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MedPortal 108 - Emergency Ambulance & Medicine Network | HealthResQ</title>
+  
+  <!-- Typography & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <!-- Leaflet 1.9.4 Map Styles -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Application CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation & Emergency Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <a href="../index.html" class="back-home-link" title="Return to HealthResQ Portal">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Portal Home</span>
+        </a>
+
+        <div class="brand-wrapper" onclick="window.app.switchTab('ambulance')">
+          <div class="brand-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div>
+            <div class="brand-title">Med<span>Portal</span> 108</div>
+            <div class="brand-tag">Apex Emergency & Pharmacy Grid</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="location-pill">
+          <span class="location-dot"></span>
+          <span id="userLocationText">Hyderabad (GPS Active)</span>
+        </div>
+
+        <button id="headerSosBtn" class="sos-trigger-btn" title="Emergency SOS (Shift + Ctrl + Enter)">
+          <i class="fa-solid fa-bell"></i>
+          <span>EMERGENCY SOS</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sticky Top Navigation Tabs -->
+  <nav class="tabs-navigation">
+    <div class="tabs-container">
+      <button class="nav-tab active" data-tab="ambulance">
+        <i class="fa-solid fa-truck-medical"></i>
+        <span>Ambulance Ride</span>
+      </button>
+
+      <button class="nav-tab" data-tab="tracking">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Live GPS Tracking</span>
+      </button>
+
+      <button class="nav-tab" data-tab="medicines">
+        <i class="fa-solid fa-prescription-bottle-medical"></i>
+        <span>Pharmacy & Drugs</span>
+      </button>
+
+      <button class="nav-tab" data-tab="prescription">
+        <i class="fa-solid fa-file-prescription"></i>
+        <span>Prescription OCR</span>
+      </button>
+
+      <button class="nav-tab" data-tab="camera">
+        <i class="fa-solid fa-camera"></i>
+        <span>Drug Vision Scanner</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main SPA Content Area -->
+  <main class="spa-main">
+
+    <!-- ================= TAB 1: AMBULANCE IN-RIDE ================= -->
+    <section id="view-ambulance" class="tab-view active">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:24px;">
+        
+        <!-- Left: Ride Status & Telemetry -->
+        <div>
+          <div class="card-panel">
+            <div class="section-title-wrap">
+              <div class="section-title">
+                <i class="fa-solid fa-shield-heart"></i>
+                Active Ride Telemetry
+              </div>
+              <span id="rideStatusPill" class="badge-tag badge-danger">EN ROUTE</span>
+            </div>
+
+            <!-- Ride Code Joiner -->
+            <div style="display:flex;gap:10px;margin-bottom:20px;">
+              <input type="text" id="inputRideCode" value="RIDE-HYD-108" placeholder="Enter Ride Code" 
+                     style="flex:1;padding:12px;border:1px solid var(--border);border-radius:var(--radius-md);font-weight:700;font-size:0.95rem;text-transform:uppercase;">
+              <button id="btnJoinRide" class="btn-primary" style="padding:10px 18px;">
+                <i class="fa-solid fa-link"></i> Link Ride
+              </button>
+            </div>
+
+            <!-- Driver & Vehicle Details -->
+            <div style="background:#f8fafc;border-radius:var(--radius-md);padding:16px;border:1px solid var(--border);margin-bottom:20px;">
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div style="width:52px;height:52px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--text-muted);">
+                  <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div style="flex:1;">
+                  <div id="driverName" style="font-weight:800;font-size:1.1rem;color:var(--text-main);">Rajesh Goud</div>
+                  <div style="font-size:0.85rem;color:var(--text-muted);">Lead Paramedic & Emergency Driver</div>
+                  <div style="font-size:0.85rem;margin-top:2px;">
+                    <a id="driverPhone" href="tel:+919876543210" style="color:var(--secondary);font-weight:700;text-decoration:none;">
+                      <i class="fa-solid fa-phone"></i> +91-9876543210
+                    </a>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <span id="ambulanceNumber" style="font-family:monospace;font-weight:800;font-size:0.95rem;background:#fee2e2;color:var(--primary);padding:4px 8px;border-radius:6px;">
+                    TS-09-EM-1081
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Destination & ETA Card -->
+            <div style="background:#ffffff;border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div style="font-size:0.8rem;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Destination Hospital</div>
+                  <div id="destHospitalName" style="font-size:1.1rem;font-weight:800;color:var(--text-main);margin-top:2px;">Apollo Hospitals - Jubilee Hills</div>
+                </div>
+                <div id="destHospitalEta" class="badge-tag badge-warning" style="font-size:0.95rem;padding:6px 14px;">
+                  ETA: ~5 min
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Vitals Stream -->
+            <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;text-align:center;">
+              <div style="background:#f1f5f9;padding:12px;border-radius:var(--radius-md);">
+                <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">HEART RATE</div>
+                <div id="vitalHeartRate" style="font-size:1.25rem;font-weight:800;color:var(--danger);margin-top:4px;">88 BPM</div>
+              </div>
+              <div style="background:#f1f5f9;padding:12px;border-radius:var(--radius-md);">
+                <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">BLOOD PRESSURE</div>
+                <div id="vitalBp" style="font-size:1.25rem;font-weight:800;color:var(--secondary);margin-top:4px;">124/82</div>
+              </div>
+              <div style="background:#f1f5f9;padding:12px;border-radius:var(--radius-md);">
+                <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">SPO2 OXYGEN</div>
+                <div id="vitalSpo2" style="font-size:1.25rem;font-weight:800;color:var(--success);margin-top:4px;">98%</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: Periodic Vitals Feedback & Hospital Rerouter -->
+        <div>
+          <!-- 60s Periodic Feedback Card -->
+          <div class="card-panel">
+            <div class="section-title-wrap">
+              <div class="section-title">
+                <i class="fa-solid fa-notes-medical"></i>
+                In-Ride Vitals Check
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--text-muted);">
+                <span>Next due in:</span>
+                <span id="feedbackTimerBadge" class="badge-tag badge-warning" style="font-weight:800;">60s</span>
+              </div>
+            </div>
+
+            <form id="formInRideFeedback">
+              <!-- Pain Scale Slider -->
+              <div style="margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                  <label style="font-size:0.88rem;font-weight:700;">Pain Severity Scale (1 - 10)</label>
+                  <span id="painValueBadge" class="badge-tag badge-warning">4</span>
+                </div>
+                <input type="range" id="inputPainScale" min="1" max="10" value="4" style="width:100%;accent-color:var(--primary);">
+              </div>
+
+              <!-- Consciousness -->
+              <div style="margin-bottom:16px;">
+                <label style="display:block;font-size:0.88rem;font-weight:700;margin-bottom:6px;">Patient Consciousness</label>
+                <select id="selectConsciousness" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);font-weight:600;">
+                  <option value="alert">Alert & Responsive</option>
+                  <option value="voice">Responds to Voice</option>
+                  <option value="pain">Responds Only to Pain</option>
+                  <option value="unresponsive">Unresponsive</option>
+                </select>
+              </div>
+
+              <!-- Breathing -->
+              <div style="margin-bottom:16px;">
+                <label style="display:block;font-size:0.88rem;font-weight:700;margin-bottom:6px;">Breathing Status</label>
+                <select id="selectBreathing" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);font-weight:600;">
+                  <option value="normal">Normal & Stable</option>
+                  <option value="shallow">Shallow / Rapid</option>
+                  <option value="labored">Labored / Dyspnea</option>
+                  <option value="none">Severe Respiratory Distress</option>
+                </select>
+              </div>
+
+              <!-- Emergency Notes -->
+              <div style="margin-bottom:18px;">
+                <label style="display:block;font-size:0.88rem;font-weight:700;margin-bottom:6px;">Paramedic / Patient Notes</label>
+                <input type="text" id="inputFeedbackNotes" placeholder="e.g. Chest discomfort improving with oxygen" 
+                       style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;">
+              </div>
+
+              <button type="submit" class="btn-primary" style="width:100%;">
+                <i class="fa-solid fa-paper-plane"></i> Submit Vitals to Trauma Command
+              </button>
+            </form>
+          </div>
+
+          <!-- Nearby Hospital Rerouter (Within 20km) -->
+          <div class="card-panel">
+            <div class="section-title-wrap">
+              <div class="section-title">
+                <i class="fa-solid fa-hospital-user"></i>
+                Reroute Destination (Within 20 KM)
+              </div>
+            </div>
+            <div id="nearbyHospitalsList">
+              <!-- Rendered dynamically by AmbulanceModule -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: LIVE TRACKING ================= -->
+    <section id="view-tracking" class="tab-view">
+      <div class="card-panel" style="position:relative;padding:0;overflow:hidden;">
+        <!-- Dynamic ETA countdown pill -->
+        <div id="etaPill" class="eta-pill">
+          <i class="fa-solid fa-route"></i>
+          <span id="etaPillText">ETA: ~5 MINS</span>
+        </div>
+
+        <!-- Leaflet Map Container -->
+        <div id="trackingMap"></div>
+      </div>
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;background:#ffffff;padding:16px 24px;border-radius:var(--radius-md);border:1px solid var(--border);flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:20px;font-size:0.9rem;flex-wrap:wrap;">
+          <div><i class="fa-solid fa-circle" style="color:var(--primary);font-size:0.6rem;"></i> <strong>Vehicle:</strong> TS-09-EM-1081</div>
+          <div><i class="fa-solid fa-location-arrow" style="color:var(--secondary);font-size:0.8rem;"></i> <strong>Speed:</strong> 48 km/h</div>
+          <div><i class="fa-solid fa-signal" style="color:var(--success);font-size:0.8rem;"></i> <strong>Telemetry:</strong> Live GPS Active</div>
+        </div>
+        <button class="btn-outline" onclick="window.TrackingModule.playArrivalChime()">
+          <i class="fa-solid fa-volume-high"></i> Test Arrival Chime
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: MEDICINES & PHARMACIES ================= -->
+    <section id="view-medicines" class="tab-view">
+      <div style="display:grid;grid-template-columns:360px 1fr;gap:24px;">
+        
+        <!-- Left: Search & Filter Panel -->
+        <div class="card-panel">
+          <div class="section-title">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Search Catalog
+          </div>
+          <div style="margin:16px 0;">
+            <input type="text" id="searchMedicineInput" placeholder="Search drug, generic name (e.g. Dolo, Mox)..." 
+                   style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.92rem;">
+            <span style="font-size:0.75rem;color:var(--text-muted);display:block;margin-top:6px;">
+              300ms Debounced &bull; Queries OpenFDA & Local 24x7 Inventory
+            </span>
+          </div>
+
+          <div id="medicineSearchResults" style="max-height:550px;overflow-y:auto;padding-right:4px;">
+            <!-- Populated dynamically by MedicinesModule -->
+          </div>
+        </div>
+
+        <!-- Right: Pharmacy Inventory & Geohash Proximity -->
+        <div class="card-panel">
+          <div class="section-title-wrap">
+            <div class="section-title">
+              <i class="fa-solid fa-store"></i>
+              Nearby 24x7 Pharmacies Carrying Stock
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;">
+              <label style="font-size:0.85rem;color:var(--text-muted);font-weight:600;">Sort By:</label>
+              <select id="sortPharmaciesSelect" style="padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.85rem;">
+                <option value="distance">Nearest First (Distance)</option>
+                <option value="price">Lowest Price</option>
+                <option value="rating">Highest Rating</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="pharmacyAvailabilityList">
+            <!-- Populated dynamically by MedicinesModule -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: PRESCRIPTION OCR ================= -->
+    <section id="view-prescription" class="tab-view">
+      <div style="display:grid;grid-template-columns:1fr 400px;gap:24px;">
+        
+        <!-- Left: Upload Scan & Progress -->
+        <div class="card-panel">
+          <div class="section-title">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            Prescription Scanner & OCR Extractor
+          </div>
+          <p style="font-size:0.9rem;color:var(--text-muted);margin:8px 0 20px;">
+            Upload doctor prescription slips or digital e-Prescriptions. Our Cloud Vision parser extracts items directly into your emergency cart.
+          </p>
+
+          <!-- Drag and Drop Box -->
+          <div id="prescriptionDropzone" class="dropzone-box">
+            <i class="fa-solid fa-file-medical dropzone-icon"></i>
+            <div style="font-weight:700;font-size:1.1rem;color:var(--text-main);margin-bottom:6px;">
+              Drag & Drop Prescription Image Here
+            </div>
+            <div style="font-size:0.85rem;color:var(--text-muted);">
+              or click to browse from device (JPG, PNG, WebP)
+            </div>
+            <input type="file" id="prescriptionFileInput" accept="image/*" style="display:none;">
+          </div>
+
+          <!-- Real-Time Progress Bar & Status -->
+          <div id="ocrStatusWrap" style="display:none;margin-top:24px;">
+            <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:700;margin-bottom:6px;">
+              <span id="ocrStatusText">Processing prescription...</span>
+            </div>
+            <div style="width:100%;height:8px;background:#e2e8f0;border-radius:9999px;overflow:hidden;">
+              <div id="ocrProgressBar" style="width:0%;height:100%;background:var(--primary);transition:width 0.4s ease;"></div>
+            </div>
+          </div>
+
+          <!-- Sample Quick Test Buttons -->
+          <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px;">
+            <div style="font-size:0.85rem;font-weight:700;margin-bottom:10px;">Quick Test with Sample Medical Prescription:</div>
+            <button class="btn-outline" onclick="window.PrescriptionModule.simulatePrescriptionOcr('sample')">
+              <i class="fa-solid fa-bolt"></i> Run Sample Rx Parser (Dolo, Pan 40, Azithral)
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Itemized Cart Checkout -->
+        <div class="card-panel">
+          <div class="section-title-wrap">
+            <div class="section-title">
+              <i class="fa-solid fa-cart-shopping"></i>
+              Prescription Order Cart
+            </div>
+            <span id="cartCountBadge" class="badge-tag badge-info">0 items</span>
+          </div>
+
+          <div id="prescriptionCartItems" style="min-height:220px;max-height:360px;overflow-y:auto;">
+            <!-- Populated dynamically by PrescriptionModule -->
+          </div>
+
+          <div style="margin-top:20px;border-top:2px solid var(--border);padding-top:16px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.9rem;color:var(--text-muted);">
+              <span>Subtotal:</span>
+              <span id="cartSubtotal">₹0.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.9rem;color:var(--text-muted);">
+              <span>Emergency Delivery Fee:</span>
+              <span>₹40.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:0.9rem;color:var(--text-muted);">
+              <span>GST & Packaging (5%):</span>
+              <span>Calculated</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:20px;font-size:1.25rem;font-weight:800;color:var(--text-main);">
+              <span>Grand Total:</span>
+              <span id="cartGrandTotal" style="color:var(--primary);">₹0.00</span>
+            </div>
+
+            <button id="btnPrescriptionCheckout" class="btn-primary" style="width:100%;padding:14px;">
+              <i class="fa-solid fa-truck-fast"></i> Place Prescription Order
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= TAB 5: CAMERA DRUG SCANNER ================= -->
+    <section id="view-camera" class="tab-view">
+      <div style="max-width:680px;margin:0 auto;">
+        
+        <div class="card-panel">
+          <div class="section-title-wrap">
+            <div class="section-title">
+              <i class="fa-solid fa-camera-viewfinder"></i>
+              AI Camera Drug Scanner
+            </div>
+            <span class="badge-tag badge-success">facingMode: environment</span>
+          </div>
+          <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:18px;">
+            Align the medicine package, strip, or blister foil inside the viewfinder. The OCR identifies the drug and verifies availability instantly.
+          </p>
+
+          <!-- Camera Stream Box with Laser Line -->
+          <div class="camera-viewport-wrap">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <div class="scanner-laser-line"></div>
+          </div>
+
+          <!-- Controls -->
+          <div style="display:flex;justify-content:center;gap:14px;margin-top:20px;flex-wrap:wrap;">
+            <button id="btnCaptureDrug" class="btn-primary" style="padding:14px 28px;font-size:1rem;">
+              <i class="fa-solid fa-camera"></i> Snapshot & Scan
+            </button>
+            <button id="btnStartCamera" class="btn-outline">
+              <i class="fa-solid fa-video"></i> Start
+            </button>
+            <button id="btnStopCamera" class="btn-outline">
+              <i class="fa-solid fa-stop"></i> Stop
+            </button>
+          </div>
+
+          <!-- 429 Rate Limiter Cooldown Banner -->
+          <div id="cameraCooldownBanner" class="cooldown-banner">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <div>
+              Rate Limit Protection Active. Cooldown: <span id="cooldownClock">60s</span>
+            </div>
+          </div>
+
+          <!-- Scanned Drug Result Card -->
+          <div id="scannedDrugResult" style="display:none;margin-top:20px;"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= GLOBAL SOS FULLSCREEN OVERLAY ================= -->
+  <div id="sosOverlay" class="sos-overlay">
+    <div class="sos-modal">
+      <div class="sos-pulsing-ring">
+        <div id="sosCountdown">10</div>
+      </div>
+      <h2>CRITICAL EMERGENCY SOS</h2>
+      <p style="margin:12px 0 20px;color:#fecdd3;font-size:0.95rem;line-height:1.5;">
+        Dispatching immediate distress alerts with live coordinates to 108 Emergency Control, WhatsApp emergency contacts, and Trauma Units.
+      </p>
+
+      <div class="sos-actions">
+        <button class="btn-sos-immediate" onclick="window.app.executeSosImmediate()">
+          <i class="fa-solid fa-bolt"></i> DISPATCH IMMEDIATELY NOW
+        </button>
+        <button class="btn-sos-cancel" onclick="window.app.cancelSos()">
+          <i class="fa-solid fa-xmark"></i> Cancel (False Alarm)
+        </button>
+      </div>
+      <div style="font-size:0.75rem;color:#94a3b8;margin-top:14px;">
+        Keyboard shortcut: <kbd style="background:#1f2937;padding:2px 6px;border-radius:4px;border:1px solid #374151;">Shift + Ctrl + Enter</kbd>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="app.js"></script>
+  <script src="modules/ambulance.js"></script>
+  <script src="modules/tracking.js"></script>
+  <script src="modules/medicines.js"></script>
+  <script src="modules/prescription.js"></script>
+  <script src="modules/camera.js"></script>
+
+</body>
+</html>

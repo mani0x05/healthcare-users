@@ -1,0 +1,7 @@
+RewriteEngine On
+
+RewriteRule ^trigger/?$ trigger.php [QSA,L]
+RewriteRule ^location/([^/]+)/?$ location.php?sessionId=$1 [QSA,L]
+RewriteRule ^location/?$ location.php [QSA,L]
+RewriteRule ^complete/([^/]+)/?$ complete.php?sessionId=$1 [QSA,L]
+RewriteRule ^complete/?$ complete.php [QSA,L]

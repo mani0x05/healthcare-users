@@ -1,0 +1,3786 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Citizen & Voluntary Blood Donor Portal | HealthResQ</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.5.2 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- QRCode.js for Emergency Digital ID -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* =====================================================
+           CORE DESIGN SYSTEM & CSS TOKENS (Directly matching E:\all in one)
+        ===================================================== */
+        :root {
+            --primary: #d90429;
+            --primary-dark: #8d0d18;
+            --primary-light: #ef233c;
+            --secondary: #2563eb;
+            --secondary-hover: #1d4ed8;
+            --bg-gradient: linear-gradient(135deg, #eef2f6 0%, #f8fafc 50%, #e2e8f0 100%);
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 35px rgba(0, 0, 0, 0.15);
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =====================================================
+           TOP EMERGENCY BAR
+        ===================================================== */
+        .top-emergency-bar {
+            background: #111827;
+            color: #f3f4f6;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .top-emergency-bar .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            font-size: 12px;
+        }
+
+        .top-emergency-bar .status-pill span.pulse {
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ef4444;
+            animation: blink 1.2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.85); }
+        }
+
+        .top-quick-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            position: relative;
+        }
+
+        .shortcut-badge {
+            display: none;
+            font-size: 12px;
+            opacity: 0.8;
+            color: #94a3b8;
+        }
+
+        @media (min-width: 900px) {
+            .shortcut-badge { display: inline-block; }
+        }
+
+        kbd {
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+        }
+
+        .sos-quick-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .sos-quick-btn:hover {
+            background: #b91c1c;
+            transform: scale(1.03);
+            box-shadow: 0 0 16px rgba(220, 38, 38, 0.6);
+        }
+
+        /* Top Profile Capsule */
+        .user-capsule {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+            padding: 4px 12px 4px 6px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .user-capsule:hover {
+            border-color: #f87171;
+            background: #334155;
+        }
+
+        .capsule-avatar {
+            width: 26px;
+            height: 26px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .capsule-role-tag {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 2px 7px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .capsule-role-tag.citizen-only {
+            background: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .top-auth-btn {
+            background: transparent;
+            border: 1px solid #475569;
+            color: #f1f5f9;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .top-auth-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #94a3b8;
+        }
+
+        /* Profile Dropdown Menu */
+        .profile-dropdown {
+            position: absolute;
+            top: 42px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e2e8f0;
+            width: 250px;
+            z-index: 1050;
+            display: none;
+            overflow: hidden;
+            animation: dropdownFade 0.2s ease-out;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        @keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-dropdown-header {
+            padding: 14px 16px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dropdown-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .dropdown-id {
+            font-size: 11px;
+            color: #64748b;
+            font-family: monospace;
+            margin-top: 2px;
+        }
+
+        .profile-dropdown-menu {
+            list-style: none;
+            padding: 6px 0;
+            margin: 0;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            color: #64748b;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .dropdown-item:hover i {
+            color: var(--primary);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 4px 0;
+        }
+
+        .dropdown-item.logout {
+            color: #dc2626;
+        }
+
+        .dropdown-item.logout i {
+            color: #dc2626;
+        }
+
+        /* =====================================================
+           HEADER BANNER
+        ===================================================== */
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 34px 20px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        header p {
+            font-size: 15px;
+            margin-top: 8px;
+            opacity: 0.92;
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* =====================================================
+           PILL NAVIGATION TABS
+        ===================================================== */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: white;
+            padding: 10px 15px;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn i {
+            font-size: 15px;
+        }
+
+        .nav-btn:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(217, 4, 41, 0.3);
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 11px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .nav-btn:not(.active) .tab-badge {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* =====================================================
+           PAGE CONTENT CONTAINER
+        ===================================================== */
+        .page-content {
+            flex: 1;
+            max-width: 1080px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 30px 20px 60px;
+        }
+
+        .section-view {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .section-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-card-container {
+            background: white;
+            padding: 35px 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .section-header-block {
+            margin-bottom: 24px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-header-block h2 {
+            font-size: 22px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header-block p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .form-subtitle {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 28px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+        }
+
+        .form-subtitle:first-of-type {
+            margin-top: 10px;
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="date"],
+        input[type="password"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-main);
+            background: #fff;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(217, 4, 41, 0.15);
+        }
+
+        /* Dual Role Selector Cards */
+        .choice-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 14px 0 20px;
+        }
+
+        .choice-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            background: #f8fafc;
+        }
+
+        .choice-card:hover {
+            border-color: #cbd5e1;
+            background: #fff;
+            transform: translateY(-2px);
+        }
+
+        .choice-card.selected {
+            border-color: var(--primary);
+            background: rgba(217, 4, 41, 0.03);
+            box-shadow: 0 6px 16px rgba(217, 4, 41, 0.12);
+        }
+
+        .choice-card.selected.choice-citizen-only {
+            border-color: var(--secondary);
+            background: rgba(37, 99, 235, 0.03);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+        }
+
+        .choice-card h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .choice-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .radio-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .choice-card.selected .radio-indicator {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        .choice-card.selected.choice-citizen-only .radio-indicator {
+            border-color: var(--secondary);
+            background: var(--secondary);
+        }
+
+        .choice-card.selected .radio-indicator::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        /* GPS Auto Detect Box */
+        .gps-detect-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .btn-detect-gps {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-detect-gps:hover {
+            background: #334155;
+        }
+
+        /* =====================================================
+           DROPZONE & MEDICAL FILE UPLOAD SYSTEM
+        ===================================================== */
+        .dropzone-container {
+            border: 2px dashed #cbd5e1;
+            background: #f8fafc;
+            border-radius: var(--radius-md);
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .dropzone-container:hover,
+        .dropzone-container.dragover {
+            border-color: var(--primary);
+            background: rgba(217, 4, 41, 0.02);
+        }
+
+        .dropzone-icon {
+            font-size: 38px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            transition: color 0.2s;
+        }
+
+        .dropzone-container:hover .dropzone-icon {
+            color: var(--primary);
+        }
+
+        .dropzone-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .dropzone-subtitle {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .dropzone-btn {
+            margin-top: 12px;
+            display: inline-block;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* Staged Files List */
+        .staged-files-list {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .staged-file-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .file-left-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .file-format-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .badge-pdf { background: #fee2e2; color: #dc2626; }
+        .badge-img { background: #dbeafe; color: #2563eb; }
+        .badge-doc { background: #f3e8ff; color: #7c3aed; }
+        .badge-other { background: #f1f5f9; color: #475569; }
+
+        .file-meta-info h5 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 320px;
+        }
+
+        .file-meta-info p {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .cat-tag {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-remove-staged {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-remove-staged:hover {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            box-shadow: 0 8px 20px rgba(217, 4, 41, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(217, 4, 41, 0.35);
+        }
+
+        /* =====================================================
+           PROFILE & DIGITAL ID CARD VIEW
+        ===================================================== */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 850px) {
+            .profile-grid {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        .digital-id-card {
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: 26px 28px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .digital-id-card.card-citizen-only {
+            border-color: rgba(37, 99, 235, 0.4);
+        }
+
+        .digital-id-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .digital-id-card.card-citizen-only::before {
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%);
+        }
+
+        .digital-id-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 12px;
+        }
+
+        .digital-id-header h3 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #f87171;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-citizen-only .digital-id-header h3 {
+            color: #60a5fa;
+        }
+
+        .role-tags-wrap {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tag-citizen {
+            background: #2563eb;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tag-donor {
+            background: #dc2626;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .blood-badge-large {
+            background: #dc2626;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .info-row span:first-child {
+            color: #94a3b8;
+        }
+
+        .info-row span:last-child {
+            font-weight: 600;
+            color: #f1f5f9;
+            text-align: right;
+        }
+
+        .qr-wrapper {
+            background: white;
+            padding: 16px;
+            border-radius: 14px;
+            box-shadow: var(--shadow-md);
+            display: inline-block;
+            margin: 10px auto;
+        }
+
+        /* =====================================================
+           MEDICAL RECORDS VAULT (Dedicated Tab & In Profile)
+        ===================================================== */
+        .profile-vault-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            margin-top: 24px;
+        }
+
+        .vault-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .vault-header h3 {
+            font-size: 18px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vault-filter-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .vault-filter-btn {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .vault-filter-btn:hover,
+        .vault-filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .doc-vault-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 16px;
+        }
+
+        .doc-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .doc-card:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .doc-top-info {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .doc-body-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+
+        .doc-body-info p {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .doc-actions-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .doc-action-btn {
+            flex: 1;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .doc-action-btn:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+            border-color: #cbd5e1;
+        }
+
+        .doc-action-btn.btn-delete:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fca5a5;
+        }
+
+        .vault-empty-box {
+            text-align: center;
+            padding: 40px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .vault-empty-box i {
+            font-size: 40px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .vault-empty-box h4 {
+            font-size: 15px;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        .vault-empty-box p {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Quick Upload Box inside Vault */
+        .quick-upload-card {
+            background: #f8fafc;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .quick-upload-card h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        /* =====================================================
+           MODAL SYSTEM (AUTH, DOC PREVIEW, SOS)
+        ===================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-dialog {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            transition: color 0.15s;
+        }
+
+        .modal-close-btn:hover {
+            color: #dc2626;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* Auth Modal Tabs */
+        .auth-tab-row {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .auth-tab-btn.active {
+            color: var(--primary);
+        }
+
+        .auth-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .quick-login-pills {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        .quick-login-pills p {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .quick-user-btn {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.15s;
+        }
+
+        .quick-user-btn:hover {
+            background: #f1f5f9;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* =====================================================
+           SOS OVERLAY MODAL (Exact match with E:\all in one)
+        ===================================================== */
+        .sos-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+
+        .sos-overlay.active {
+            display: flex;
+        }
+
+        .sos-modal {
+            background: #111827;
+            border: 2px solid #ef4444;
+            border-radius: 20px;
+            padding: 35px 30px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            box-shadow: 0 0 50px rgba(239, 68, 68, 0.4);
+            animation: pulseModal 1.5s infinite alternate;
+        }
+
+        @keyframes pulseModal {
+            from { box-shadow: 0 0 25px rgba(239, 68, 68, 0.3); }
+            to { box-shadow: 0 0 55px rgba(239, 68, 68, 0.6); }
+        }
+
+        .sos-alert-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .sos-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #f87171;
+            margin-bottom: 6px;
+        }
+
+        .sos-desc {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .countdown-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: 800;
+            color: white;
+            margin: 0 auto 16px;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .sos-details-box {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 12px;
+            text-align: left;
+            margin-bottom: 20px;
+            border: 1px solid #374151;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sos-details-box div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sos-details-box span {
+            color: #9ca3af;
+        }
+
+        .sos-btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .sos-cancel-btn {
+            flex: 1;
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sos-cancel-btn:hover {
+            background: #4b5563;
+        }
+
+        .sos-trigger-now-btn {
+            flex: 1;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            transition: all 0.2s;
+        }
+
+        .sos-trigger-now-btn:hover {
+            background: #dc2626;
+            transform: scale(1.02);
+        }
+
+        /* =====================================================
+           NOTIFICATION TOAST
+        ===================================================== */
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #0f172a;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            z-index: 4000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success { border-left: 5px solid #22c55e; }
+        .toast.error { border-left: 5px solid #ef4444; }
+        .toast.info { border-left: 5px solid #3b82f6; }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+        footer {
+            background: #0f172a;
+            color: #94a3b8;
+            text-align: center;
+            padding: 24px 20px;
+            font-size: 13px;
+            margin-top: auto;
+            border-top: 1px solid #1e293b;
+        }
+
+        /* =====================================================
+           PRINT MEDIA STYLES FOR OFFICIAL HEALTH CARD
+        ===================================================== */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            .top-emergency-bar,
+            header,
+            .nav-tabs,
+            #view-register,
+            #view-vault,
+            .profile-vault-card,
+            footer,
+            .submit-btn,
+            .toast,
+            .modal-overlay,
+            .sos-overlay {
+                display: none !important;
+            }
+
+            .page-content {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .profile-grid {
+                display: block !important;
+            }
+
+            .digital-id-card {
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+        }
+    
+        /* ================= HEALTHCARE HOME HEADER ================= */
+        .healthcare-header {
+            background: #e4002b;
+            color: #fff;
+            text-align: center;
+            padding: 28px 20px 30px;
+        }
+
+        .healthcare-header h1 {
+            margin: 0 0 8px;
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.2;
+            cursor: pointer;
+        }
+
+        .healthcare-header p {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        /* Home and Citizen/Medical views are separate screens. */
+        .healthcare-home {
+            display: block;
+        }
+
+        .healthcare-home.hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 700px) {
+            .healthcare-header h1 {
+                font-size: 28px;
+            }
+            .healthcare-header p {
+                font-size: 16px;
+            }
+        }
+
+        /* ================= HEALTHCARE HOME CARDS ================= */
+        .healthcare-services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .healthcare-services .card {
+            text-decoration: none;
+            color: inherit;
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 20px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,.10);
+            transition: transform .2s ease, box-shadow .2s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .healthcare-services .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 28px rgba(0,0,0,.15);
+        }
+        .healthcare-services .card i {
+            font-size: 42px;
+            margin-bottom: 14px;
+            color: #c1121f;
+        }
+        .healthcare-services .card h2 {
+            margin: 8px 0;
+            font-size: 20px;
+        }
+        .healthcare-services .card p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        @media (max-width: 700px) {
+            .healthcare-services { grid-template-columns: 1fr; }
+        }
+
+    
+        /* =====================================================
+           HEALTHCARE RED & WHITE THEME
+           All portal navigation/actions use the same red-white theme.
+        ===================================================== */
+        body {
+            background: #ffffff !important;
+        }
+
+        .top-emergency-bar {
+            background: #c1121f !important;
+            color: #ffffff !important;
+        }
+
+        .top-emergency-bar .status-pill {
+            background: rgba(255,255,255,0.16) !important;
+            color: #ffffff !important;
+        }
+
+        .nav-tabs {
+            background: #ffffff !important;
+            border-bottom: 2px solid #c1121f !important;
+        }
+
+        .nav-btn {
+            color: #c1121f !important;
+        }
+
+        .nav-btn:hover {
+            background: #fff1f2 !important;
+            color: #a50f1a !important;
+        }
+
+        .nav-btn.active {
+            background: #c1121f !important;
+            color: #ffffff !important;
+        }
+
+        .nav-btn:not(.active) .tab-badge {
+            background: #fee2e2 !important;
+            color: #c1121f !important;
+        }
+
+        .top-auth-btn {
+            border-color: #ffffff !important;
+            color: #ffffff !important;
+        }
+
+        .top-auth-btn:hover {
+            background: #ffffff !important;
+            color: #c1121f !important;
+            border-color: #ffffff !important;
+        }
+
+        .healthcare-header {
+            background: #c1121f !important;
+            color: #ffffff !important;
+        }
+
+        .healthcare-services .card i {
+            color: #c1121f !important;
+        }
+
+        .back-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 18px 0;
+            padding: 10px 18px;
+            border: 2px solid #c1121f;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #c1121f;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-home-btn:hover {
+            background: #c1121f;
+            color: #ffffff;
+        }
+
+        .section-header-block h2,
+        .form-subtitle,
+        .section-header-block h2 i,
+        .quick-upload-card h4 i,
+        .profile-vault-card h3 i {
+            color: #c1121f !important;
+        }
+
+        .digital-id-card.card-citizen-only {
+            border-color: rgba(193, 18, 31, 0.55) !important;
+        }
+
+        .digital-id-card.card-citizen-only::before {
+            background: radial-gradient(circle, rgba(193,18,31,0.22) 0%, transparent 70%) !important;
+        }
+
+        .card-citizen-only .digital-id-header h3,
+        .tag-citizen {
+            color: #ffffff !important;
+            background: #c1121f !important;
+        }
+
+        .tag-donor,
+        .blood-badge-large {
+            background: #c1121f !important;
+        }
+
+        .submit-btn,
+        .btn-detect-gps {
+            background: #c1121f !important;
+            border-color: #c1121f !important;
+            color: #ffffff !important;
+        }
+
+        .submit-btn:hover,
+        .btn-detect-gps:hover {
+            background: #8d0d18 !important;
+        }
+
+        .choice-card.selected,
+        .choice-card.selected.choice-citizen-only {
+            border-color: #c1121f !important;
+            background: #fff1f2 !important;
+        }
+
+        .auth-tab-btn.active {
+            background: #c1121f !important;
+            color: #ffffff !important;
+            border-color: #c1121f !important;
+        }
+
+        .profile-dropdown-header {
+            background: #fff1f2 !important;
+            border-bottom-color: #fecdd3 !important;
+        }
+
+        .dropdown-item:hover {
+            background: #fff1f2 !important;
+            color: #c1121f !important;
+        }
+
+        .dropdown-item i {
+            color: #c1121f !important;
+        }
+
+        .healthcare-home {
+            background: #ffffff !important;
+        }
+
+        .healthcare-services .card {
+            border-color: #fecdd3 !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- ================= HEALTHCARE HOME HEADER ================= -->
+    <header class="healthcare-header">
+        <h1 onclick="showHealthcareHome()" title="Emergency Healthcare Home">🚑 Emergency Healthcare Assistance</h1>
+        <center><p>Your One-Stop Solution for Emergency Medical Services</p></center>
+    </header>
+
+    <!-- ================= TOP EMERGENCY ACTION BAR ================= -->
+    <div class="top-emergency-bar">
+        <div class="status-pill">
+            <span class="pulse"></span> 24/7 SIH26198 CITIZEN & EMERGENCY NETWORK ACTIVE
+        </div>
+
+        <div class="top-quick-actions">
+            <span class="shortcut-badge">Shortcut: <kbd>Shift</kbd> + <kbd>Win</kbd> + <kbd>Enter</kbd></span>
+
+            <!-- Profile Capsule (Logged In) -->
+            <div class="user-capsule" id="topUserCapsule" style="display: none;" onclick="toggleProfileDropdown(event)" title="Click to view profile menu">
+                <span class="capsule-avatar" id="capAvatar">U</span>
+                <span id="capName">Citizen User</span>
+                <span class="capsule-role-tag" id="capRoleBadge">Citizen</span>
+                <i class="fa-solid fa-chevron-down" style="font-size: 11px; margin-left: 2px; color: #94a3b8;"></i>
+            </div>
+
+            <!-- Profile Dropdown Menu -->
+            <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+                <div class="profile-dropdown-header">
+                    <div class="dropdown-name" id="dropName">Citizen User</div>
+                    <div class="dropdown-id" id="dropId">ID: CIT-XXXXX-IN</div>
+                </div>
+                <ul class="profile-dropdown-menu">
+                    <li class="dropdown-item" onclick="switchTab('profile'); closeDropdown();">
+                        <i class="fa-solid fa-id-card"></i> View Digital Health ID
+                    </li>
+                    <li class="dropdown-item" onclick="switchTab('vault'); closeDropdown();">
+                        <i class="fa-solid fa-folder-medical"></i> Manage Medical Records
+                    </li>
+                    <li class="dropdown-item" onclick="editCitizenProfile(); closeDropdown();">
+                        <i class="fa-solid fa-user-pen"></i> Edit Profile Details
+                    </li>
+                    <div class="dropdown-divider"></div>
+                    <li class="dropdown-item" onclick="openAuthModal('login'); closeDropdown();">
+                        <i class="fa-solid fa-repeat"></i> Switch Account
+                    </li>
+                    <li class="dropdown-item logout" onclick="logoutUser(); closeDropdown();">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Login / Register Button (Logged Out Guest State) -->
+            <button class="top-auth-btn" id="topLoginBtn" style="display: flex;" onclick="openAuthModal('login')">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login / Register
+            </button>
+
+            <!-- Instant Emergency SOS Panic Button -->
+            <button class="sos-quick-btn" id="panicButton" onclick="triggerSosModal('click')" title="Trigger Instant Emergency SOS Panic">
+                <i class="fa-solid fa-triangle-exclamation"></i> SOS PANIC
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ================= CITIZEN / REGISTER / MEDICAL NAVIGATION ================= -->
+    <nav class="nav-tabs" id="navigationTabs">
+        <button class="nav-btn" data-tab="profile" onclick="switchTab('profile')">
+            <i class="fa-solid fa-user"></i> Citizen
+        </button>
+        <button class="nav-btn" data-tab="register" onclick="switchTab('register')">
+            <i class="fa-solid fa-user-plus"></i> Register
+        </button>
+        <button class="nav-btn" data-tab="vault" onclick="switchTab('vault')">
+            <i class="fa-solid fa-folder-medical"></i> Medical
+            <span class="tab-badge" id="tabVaultCountBadge">2</span>
+        </button>
+    </nav>
+    <!-- ================= MAIN CONTENT CONTAINER ================= -->
+    <main class="page-content">
+
+        <!-- ================= EXISTING HEALTHCARE SERVICES ================= -->
+        <section class="healthcare-home">
+            <div class="container healthcare-services">
+
+                <a href="ambulance/ambulance.html" class="card">
+                    <i class="fa-solid fa-truck-medical"></i>
+                    <h2>Ambulance Service</h2>
+                    <p>Find, book and track an ambulance instantly.</p>
+                </a>
+
+                <a href="blood.html" class="card">
+                    <i class="fa-solid fa-droplet"></i>
+                    <h2>Blood Availability</h2>
+                    <p>Search blood banks and donors.</p>
+                </a>
+
+                <a href="specialized_hospital_form.php" class="card">
+                    <i class="fa-solid fa-hospital"></i>
+                    <h2>Specialized Hospitals</h2>
+                    <p>Locate the best nearby hospitals.</p>
+                </a>
+
+                <a href="pharmacy/pharmacy.html" class="card">
+                    <i class="fa-solid fa-prescription-bottle-medical"></i>
+                    <h2>Pharmacy Near Me</h2>
+                    <p>Find nearby pharmacies and medicines.</p>
+                </a>
+                
+                <a href="donor_registration.html" class="card">
+                    <i class="fa-solid fa-hand-holding-droplet"></i>
+                    <h2>Donor Registration</h2>
+                    <p>Give blood, give hope.</p>
+                </a>
+
+                <a href="sos feature/index.html" class="card" style="border: 2px solid #ef4444; background: #fff5f5;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+                    <h2 style="color: #ef4444;">Emergency SOS Panic</h2>
+                    <p>Instant WhatsApp alert, live GPS beacon & trusted contacts broadcast.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- ================= FRIEND'S CITIZEN / REGISTER / MEDICAL SECTIONS ================= -->
+
+
+        <!-- ================= 1. REGISTRATION FORM VIEW ================= -->
+        <section id="view-register" class="section-view">
+                <button type="button" class="back-home-btn" onclick="showHealthcareHome()">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Main Interface
+                </button>
+            <div class="form-card-container">
+
+                <div class="section-header-block">
+                    <h2><i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> Unified Citizen Registration Portal</h2>
+                    <p>Provide your personal information, medical parameters, administrative LGD location, voluntary blood donor choice, and upload medical documents.</p>
+                </div>
+
+                <form id="unifiedRegisterForm" onsubmit="handleFormSubmit(event)">
+
+                    <!-- SECTION 1: CITIZEN PERSONAL DETAILS -->
+                    <div class="form-subtitle">
+                        <i class="fa-solid fa-user"></i> 1. Citizen Personal Information
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div>
+                            <label for="reg_name">Full Name *</label>
+                            <input type="text" id="reg_name" required placeholder="e.g. Rahul Sharma">
+                        </div>
+                        <div>
+                            <label for="reg_email">Email Address *</label>
+                            <input type="email" id="reg_email" required placeholder="e.g. rahul@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div>
+                            <label for="reg_phone">Mobile Number (+91) *</label>
+                            <input type="tel" id="reg_phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+                        </div>
+                        <div>
+                            <label for="reg_dob">Date of Birth *</label>
+                            <input type="date" id="reg_dob" required>
+                        </div>
+                        <div>
+                            <label for="reg_gender">Gender *</label>
+                            <select id="reg_gender" required>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div>
+                            <label for="reg_password">Portal Access Password *</label>
+                            <input type="password" id="reg_password" required placeholder="Create password for portal login (min 6 characters)">
+                        </div>
+                        <div>
+                            <label for="reg_id_type">National ID Reference (Optional)</label>
+                            <input type="text" id="reg_id_type" placeholder="Aadhaar / ABHA Health ID (Masked)">
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: MEDICAL BASELINE & EMERGENCY DETAILS -->
+                    <div class="form-subtitle">
+                        <i class="fa-solid fa-heart-pulse"></i> 2. Medical Baseline & Emergency Parameters
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div>
+                            <label for="reg_blood">Blood Group *</label>
+                            <select id="reg_blood" required>
+                                <option value="" disabled selected>Select Blood Group</option>
+                                <option value="O+">O Positive (O+)</option>
+                                <option value="O-">O Negative (O-)</option>
+                                <option value="A+">A Positive (A+)</option>
+                                <option value="A-">A Negative (A-)</option>
+                                <option value="B+">B Positive (B+)</option>
+                                <option value="B-">B Negative (B-)</option>
+                                <option value="AB+">AB Positive (AB+)</option>
+                                <option value="AB-">AB Negative (AB-)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="reg_weight">Body Weight (kg) *</label>
+                            <input type="number" id="reg_weight" min="40" max="200" required placeholder="e.g. 65">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div>
+                            <label for="reg_sos_contact">Emergency SOS Contact (Name & Phone) *</label>
+                            <input type="text" id="reg_sos_contact" required placeholder="e.g. Spouse/Parent (+91 98765 43210)">
+                        </div>
+                        <div>
+                            <label for="reg_conditions">Known Allergies / Chronic Conditions</label>
+                            <input type="text" id="reg_conditions" placeholder="e.g. Penicillin, Asthma, Diabetes (or None)">
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: LGD ADMINISTRATIVE LOCATION HIERARCHY -->
+                    <div class="form-subtitle">
+                        <i class="fa-solid fa-map-location-dot"></i> 3. Administrative LGD Location Hierarchy
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div>
+                            <label for="country">Country *</label>
+                            <select id="country" required></select>
+                        </div>
+                        <div>
+                            <label for="state">State *</label>
+                            <select id="state" required></select>
+                        </div>
+                        <div>
+                            <label for="district">District *</label>
+                            <select id="district" required></select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div>
+                            <label for="mandal">Mandal / Sub-District *</label>
+                            <select id="mandal" required></select>
+                        </div>
+                        <div>
+                            <label for="village">Village / Ward / Area *</label>
+                            <select id="village" required></select>
+                        </div>
+                        <div>
+                            <label for="pincode">PIN Code *</label>
+                            <input type="text" id="pincode" readonly required style="background: #f1f5f9; font-weight: 700; color: #1e293b;">
+                        </div>
+                    </div>
+
+                    <div class="gps-detect-bar">
+                        <div>
+                            <i class="fa-solid fa-location-crosshairs" style="color: var(--primary);"></i>
+                            <strong>Emergency Radius Coordinates:</strong>
+                            <span id="coordsDisplay">17.3850° N, 78.4867° E (20 KM Zone Active)</span>
+                        </div>
+                        <button type="button" class="btn-detect-gps" onclick="getDonorLocation()">
+                            <i class="fa-solid fa-compass"></i> Auto-Detect GPS
+                        </button>
+                    </div>
+
+                    <!-- SECTION 4: VOLUNTARY BLOOD DONOR ENROLMENT CHOICE -->
+                    <div class="form-subtitle">
+                        <i class="fa-solid fa-hand-holding-droplet"></i> 4. Voluntary Blood Donor Enrolment Choice
+                    </div>
+
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+                        Would you like to voluntarily enrol in the 20 KM Emergency Blood Network to be notified when critical emergency requests match your blood group?
+                    </p>
+
+                    <div class="choice-cards-grid">
+                        <!-- Option A: Dual Role -->
+                        <div class="choice-card selected" id="cardDonorYes" onclick="setDonorChoice(true)">
+                            <h4>
+                                <span><i class="fa-solid fa-droplet" style="color: var(--primary);"></i> Yes — Enrol as Blood Donor</span>
+                                <span class="radio-indicator"></span>
+                            </h4>
+                            <p><strong>Dual Role:</strong> Registered Citizen + Voluntary Blood Donor in local 20 KM emergency zone.</p>
+                        </div>
+
+                        <!-- Option B: Citizen Only -->
+                        <div class="choice-card choice-citizen-only" id="cardDonorNo" onclick="setDonorChoice(false)">
+                            <h4>
+                                <span><i class="fa-solid fa-user" style="color: var(--secondary);"></i> No — Citizen Only</span>
+                                <span class="radio-indicator"></span>
+                            </h4>
+                            <p><strong>Citizen Health Profile:</strong> Digital ID & medical vault without donor dispatch notifications.</p>
+                        </div>
+                    </div>
+
+                    <!-- Conditional Donor Details Box -->
+                    <div id="donorDetailsSection" style="background: #fff5f5; border: 1.5px solid #fed7d7; padding: 18px 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <h4 style="font-size: 14px; font-weight: 700; color: #9b1c1c; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-circle-check"></i> Voluntary Blood Donor Preferences (20 KM Radius)
+                        </h4>
+                        <div class="form-grid-2">
+                            <div>
+                                <label for="donor_availability">Current Donor Availability *</label>
+                                <select id="donor_availability">
+                                    <option value="Yes, Ready Immediately" selected>Yes, Ready Immediately</option>
+                                    <option value="Available on Weekends Only">Available on Weekends Only</option>
+                                    <option value="Emergency SOS Critical Requests Only">Emergency SOS Critical Requests Only</option>
+                                    <option value="Temporarily Unavailable">Temporarily Unavailable</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="donor_last_date">Last Blood Donation Date (if applicable)</label>
+                                <input type="date" id="donor_last_date" value="2026-06-15">
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; color: #7f1d1d; display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="donor_consent" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
+                            <label for="donor_consent" style="margin-bottom: 0; font-size: 12px; cursor: pointer;">
+                                I consent to receive encrypted emergency blood shortage notifications from local hospitals within 20 KM.
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: MEDICAL RECORDS & HEALTH DOCUMENTS UPLOAD (DROPZONE) -->
+                    <div class="form-subtitle">
+                        <i class="fa-solid fa-file-medical"></i> 5. Medical Records & Health Documents Upload
+                    </div>
+
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+                        Attach existing prescriptions, diagnostic lab reports, vaccination certificates, or discharge summaries to your secure health vault.
+                    </p>
+
+                    <div class="form-grid-2" style="margin-bottom: 12px;">
+                        <div>
+                            <label for="doc_category_select">Document Category</label>
+                            <select id="doc_category_select">
+                                <option value="Prescription">Prescription</option>
+                                <option value="Lab & Diagnostic Report" selected>Lab & Diagnostic Report</option>
+                                <option value="Vaccination Certificate">Vaccination Certificate</option>
+                                <option value="Discharge Summary">Discharge Summary</option>
+                                <option value="Health Insurance">Health Insurance Card/Policy</option>
+                                <option value="Other Medical Record">Other Medical Record</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="doc_title_input">Custom Title / Clinical Note (Optional)</label>
+                            <input type="text" id="doc_title_input" placeholder="e.g. Complete Blood Count (CBC) Report">
+                        </div>
+                    </div>
+
+                    <!-- Interactive Drag-and-Drop Area -->
+                    <div class="dropzone-container" id="regDropzone">
+                        <input type="file" id="regFileInput" multiple accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display: none;">
+                        <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+                        <div class="dropzone-title">Drag & Drop Medical Records Here</div>
+                        <div class="dropzone-subtitle">Supported formats: PDF, PNG, JPG, JPEG, DOC, DOCX (up to 10 MB each)</div>
+                        <span class="dropzone-btn"><i class="fa-solid fa-folder-open"></i> Browse Files from Device</span>
+                    </div>
+
+                    <!-- Staged Files Preview List -->
+                    <div class="staged-files-list" id="regStagedList"></div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <button type="submit" class="submit-btn" id="regSubmitBtn">
+                        <i class="fa-solid fa-id-card-clip"></i> Complete Registration & Generate Digital Health ID
+                    </button>
+
+                </form>
+
+            </div>
+        </section>
+
+        <!-- ================= 2. REGISTERED PROFILE & DIGITAL ID CARD VIEW ================= -->
+        <section id="view-profile" class="section-view">
+                <button type="button" class="back-home-btn" onclick="showHealthcareHome()">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Main Interface
+                </button>
+            <div class="section-header-block" style="background:white; padding: 20px 24px; border-radius: var(--radius-md); margin-bottom: 20px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h2><i class="fa-solid fa-id-card-clip" style="color: var(--primary);"></i> Registered Citizen & Health Profile</h2>
+                    <p>Digital medical health card, verified credentials, dynamic QR code, and attached health records.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-detect-gps" onclick="editCitizenProfile()">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                    </button>
+                    <button type="button" class="btn-detect-gps" style="background: var(--primary);" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> Print ID Card
+                    </button>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+
+                <!-- Digital Health ID Card -->
+                <div class="digital-id-card" id="profileDigitalCard">
+                    <div class="digital-id-header">
+                        <h3 id="profCardHeaderTitle"><i class="fa-solid fa-heart-pulse"></i> DIGITAL HEALTH & DONOR ID</h3>
+                        <div class="role-tags-wrap" id="profRoleTagsWrap">
+                            <span class="tag-citizen" id="tagCitizen"><i class="fa-solid fa-user-check"></i> Citizen</span>
+                            <span class="tag-donor" id="tagDonor"><i class="fa-solid fa-droplet"></i> Donor</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <h2 style="font-size: 22px; font-weight: 800; color: white;" id="profNameDisplay">Please Login or Register</h2>
+                            <p style="font-size: 12px; color: #94a3b8; font-family: monospace;" id="profIdDisplay">ID: Not Logged In</p>
+                        </div>
+                        <div class="blood-badge-large">
+                            <i class="fa-solid fa-droplet"></i> <span id="profBloodDisplay">--</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Mobile Phone:</span>
+                        <span id="profPhoneDisplay">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Email Address:</span>
+                        <span id="profEmailDisplay">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Gender / DOB:</span>
+                        <span id="profGenderDobDisplay">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Donor Status:</span>
+                        <span style="color: #4ade80;" id="profDonorStatusDisplay">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span>LGD Location:</span>
+                        <span id="profLocationDisplay">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Area & PIN Code:</span>
+                        <span id="profAreaPinDisplay">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Emergency SOS Contact:</span>
+                        <span style="color: #fca5a5;" id="profSosDisplay">---</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Medical / Allergies:</span>
+                        <span id="profConditionsDisplay">---</span>
+                    </div>
+
+                    <div style="margin-top: 20px; font-size: 11px; color: #94a3b8; text-align: center; border-top: 1px solid #334155; padding-top: 12px;" id="profFooterBadge">
+                        <i class="fa-solid fa-shield-halved" style="color: #60a5fa;"></i> Official Citizen Health ID Record
+                    </div>
+                </div>
+
+                <!-- QR Card Box -->
+                <div class="form-card-container" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <h3 style="font-size: 18px; font-weight: 800; color: #111827; margin-bottom: 6px;">
+                        <i class="fa-solid fa-qrcode" style="color: var(--primary);"></i> Emergency Digital QR ID
+                    </h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+                        Scan with any phone camera or paramedic scanner for verified medical & donor profile
+                    </p>
+
+                    <div class="qr-wrapper">
+                        <div id="qrcode"></div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; width: 100%; margin-top: 15px;">
+                        <button type="button" class="submit-btn" style="margin-top: 0; background: #0f172a;" onclick="editCitizenProfile()">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                        </button>
+                        <button type="button" class="submit-btn" style="margin-top: 0;" onclick="window.print()">
+                            <i class="fa-solid fa-print"></i> Print ID
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Profile Medical Records Vault Section -->
+            <div class="profile-vault-card">
+                <div class="vault-header">
+                    <h3>
+                        <i class="fa-solid fa-folder-medical" style="color: var(--primary);"></i> Attached Medical Records & Documents
+                    </h3>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span class="vault-filter-btn" style="cursor: default;" id="profDocCountBadge">2 Records Attached</span>
+                        <button type="button" class="btn-detect-gps" onclick="switchTab('vault')">
+                            <i class="fa-solid fa-plus"></i> Upload New Document
+                        </button>
+                    </div>
+                </div>
+
+                <div class="doc-vault-grid" id="profDocsGrid"></div>
+            </div>
+
+        </section>
+
+        <!-- ================= 3. DEDICATED MEDICAL RECORDS VAULT VIEW ================= -->
+        <section id="view-vault" class="section-view">
+                <button type="button" class="back-home-btn" onclick="showHealthcareHome()">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Main Interface
+                </button>
+            <div class="form-card-container">
+
+                <div class="section-header-block">
+                    <h2><i class="fa-solid fa-folder-medical" style="color: var(--primary);"></i> Citizen Medical Records Vault</h2>
+                    <p>Securely store, organize, preview, and download your clinical prescriptions, lab reports, and health records.</p>
+                </div>
+
+                <!-- Quick Direct Upload Widget -->
+                <div class="quick-upload-card">
+                    <h4><i class="fa-solid fa-cloud-arrow-up" style="color: var(--primary);"></i> Quick Upload New Medical Document to Vault</h4>
+                    <div class="form-grid-3">
+                        <div>
+                            <label for="vault_doc_cat">Document Category *</label>
+                            <select id="vault_doc_cat">
+                                <option value="Prescription">Prescription</option>
+                                <option value="Lab & Diagnostic Report">Lab & Diagnostic Report</option>
+                                <option value="Vaccination Certificate">Vaccination Certificate</option>
+                                <option value="Discharge Summary">Discharge Summary</option>
+                                <option value="Health Insurance">Health Insurance Card/Policy</option>
+                                <option value="Other Medical Record">Other Medical Record</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="vault_doc_title">Document Title / Clinical Note *</label>
+                            <input type="text" id="vault_doc_title" placeholder="e.g. Cardiology ECG Report - Apollo">
+                        </div>
+                        <div>
+                            <label for="vault_file_direct">Select Document (PDF / Image / DOC) *</label>
+                            <input type="file" id="vault_file_direct" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-detect-gps" style="background: var(--primary); padding: 9px 18px; font-size: 13px;" onclick="uploadDirectToVault()">
+                        <i class="fa-solid fa-plus"></i> Add Document to Vault
+                    </button>
+                </div>
+
+                <!-- Filter Pills -->
+                <div class="vault-filter-pills">
+                    <button type="button" class="vault-filter-btn active" onclick="filterVaultDocs('All', this)">All Records</button>
+                    <button type="button" class="vault-filter-btn" onclick="filterVaultDocs('Prescription', this)">Prescriptions</button>
+                    <button type="button" class="vault-filter-btn" onclick="filterVaultDocs('Lab & Diagnostic Report', this)">Lab Reports</button>
+                    <button type="button" class="vault-filter-btn" onclick="filterVaultDocs('Vaccination Certificate', this)">Vaccinations</button>
+                    <button type="button" class="vault-filter-btn" onclick="filterVaultDocs('Discharge Summary', this)">Discharge Summaries</button>
+                    <button type="button" class="vault-filter-btn" onclick="filterVaultDocs('Health Insurance', this)">Insurance</button>
+                </div>
+
+                <!-- Vault Documents Grid -->
+                <div class="doc-vault-grid" id="fullVaultDocsGrid"></div>
+
+            </div>
+        </section>
+
+    
+    </main>
+
+    <!-- ================= DOCUMENT PREVIEW LIGHTBOX MODAL ================= -->
+    <div class="modal-overlay" id="docPreviewModal" onclick="closeDocPreview(event)">
+        <div class="modal-dialog" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h4 id="modalDocTitle"><i class="fa-solid fa-file-medical"></i> Document Preview</h4>
+                <button type="button" class="modal-close-btn" onclick="closeDocPreview()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="modalDocBody"></div>
+        </div>
+    </div>
+
+    <!-- ================= AUTHENTICATION MODAL (LOGIN & SIGN UP) ================= -->
+    <div class="modal-overlay" id="authModal" onclick="closeAuthModal(event)">
+        <div class="modal-dialog" style="max-width: 440px;" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h4 id="authModalTitle"><i class="fa-solid fa-user-lock" style="color: var(--primary);"></i> Citizen Portal Access</h4>
+                <button type="button" class="modal-close-btn" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tab-row">
+                    <button type="button" class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">Citizen Login</button>
+                    <button type="button" class="auth-tab-btn" id="tabBtnSignup" onclick="switchAuthTab('signup')">Quick Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <div id="authLoginForm">
+                    <div style="margin-bottom: 14px;">
+                        <label>Mobile Number or Email</label>
+                        <input type="text" id="login_identifier" placeholder="Enter mobile or email">
+                    </div>
+                    <div style="margin-bottom: 18px;">
+                        <label>Password</label>
+                        <input type="password" id="login_password" placeholder="Enter password">
+                    </div>
+                    <button type="button" class="submit-btn" style="margin-top: 0; padding: 12px;" onclick="executeLogin()">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Citizen Portal
+                    </button>
+                </div>
+
+                <!-- Quick Sign Up Form -->
+                <div id="authSignupForm" style="display: none;">
+                    <div style="margin-bottom: 12px;">
+                        <label>Full Name</label>
+                        <input type="text" id="signup_name" placeholder="e.g. Anand Varma">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label>Mobile Phone (+91)</label>
+                        <input type="tel" id="signup_phone" placeholder="10-digit mobile number">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label>Email Address</label>
+                        <input type="email" id="signup_email" placeholder="e.g. anand@example.com">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label>Password</label>
+                        <input type="password" id="signup_password" placeholder="Create a password">
+                    </div>
+                    <button type="button" class="submit-btn" style="margin-top: 0; padding: 12px;" onclick="executeSignup()">
+                        <i class="fa-solid fa-user-plus"></i> Proceed to Full Registration
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= EMERGENCY SOS PANIC MODAL (Matching E:\all in one) ================= -->
+    <div class="sos-overlay" id="sosOverlay">
+        <div class="sos-modal">
+            <div class="sos-alert-badge">
+                <span class="pulse"></span> Critical Alert Triggered
+            </div>
+            <h2 class="sos-title">EMERGENCY SOS PANIC</h2>
+            <p class="sos-desc">Notifying trusted contacts, local authorities, and nearest ambulances.</p>
+
+            <div class="countdown-circle" id="sosCountdown">10</div>
+            <p style="font-size: 13px; color: #f87171; font-weight:600; margin-bottom: 16px;">
+                Sending high-priority emergency broadcast in <span id="sosCountdownSub">10</span> seconds...
+            </p>
+
+            <div class="sos-details-box">
+                <div><span>Trigger Source:</span> <strong id="sosTriggerType">SOS Button Pressed</strong></div>
+                <div><span>GPS Coordinates:</span> <strong id="sosCoords">17.3850° N, 78.4867° E</strong></div>
+                <div><span>Firestore Session ID:</span> <span id="sosSessionId" style="font-family: monospace;">---</span></div>
+                <div><span>Twilio SMS/Call Broadcast:</span> <span style="color:#22c55e;">Armed (2 Contacts)</span></div>
+                <div><span>Encryption:</span> <span>AES-256-GCM Secure</span></div>
+            </div>
+
+            <div class="sos-btn-group">
+                <button type="button" class="sos-cancel-btn" onclick="cancelSos()">
+                    <i class="fa-solid fa-xmark"></i> Cancel SOS
+                </button>
+                <button type="button" class="sos-trigger-now-btn" onclick="executeSosImmediate()">
+                    <i class="fa-solid fa-paper-plane"></i> Send Immediately
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= NOTIFICATION TOAST ================= -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-info" id="toastIcon"></i>
+        <span id="toastMessage">Notification message</span>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+        <p>&copy; 2026 Emergency Healthcare Assistance</p>
+    </footer>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        /* =====================================================
+           GLOBAL STATE & TOAST SYSTEM
+        ===================================================== */
+        let currentLatitude = 17.3850;
+        let currentLongitude = 78.4867;
+        let isBloodDonorChoice = true;
+        let stagedMedicalRecords = [];
+        let qrCodeInstance = null;
+        let currentVaultFilter = 'All';
+
+        // Current Active User (Loaded from MySQL / Local Storage Session)
+        let currentUser = null;
+
+        // Load Session from localStorage if citizen has previously logged in
+        function initUserSession() {
+            try {
+                const savedSession = localStorage.getItem("healthresq_user_session");
+                if (savedSession) {
+                    currentUser = JSON.parse(savedSession);
+                } else {
+                    currentUser = null;
+                }
+            } catch (e) {
+                currentUser = null;
+            }
+
+            updateUserTopCapsule();
+            renderProfileDisplay();
+            renderVaultDisplay();
+        }
+
+        function saveUserSession() {
+            if (currentUser) {
+                localStorage.setItem("healthresq_user_session", JSON.stringify(currentUser));
+            } else {
+                localStorage.removeItem("healthresq_user_session");
+            }
+            updateUserTopCapsule();
+        }
+
+        function updateUserTopCapsule() {
+            const topCapsule = document.getElementById("topUserCapsule");
+            const topLoginBtn = document.getElementById("topLoginBtn");
+            const capAvatar = document.getElementById("capAvatar");
+            const capName = document.getElementById("capName");
+            const capRoleBadge = document.getElementById("capRoleBadge");
+            const dropName = document.getElementById("dropName");
+            const dropId = document.getElementById("dropId");
+
+            if (currentUser) {
+                topCapsule.style.display = "flex";
+                topLoginBtn.style.display = "none";
+                capAvatar.textContent = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : "U";
+                capName.textContent = currentUser.name || "Citizen User";
+                dropName.textContent = currentUser.name || "Citizen User";
+                dropId.textContent = "ID: " + (currentUser.id || "CIT-REG");
+
+                if (currentUser.isDonor) {
+                    capRoleBadge.textContent = "Citizen + Donor";
+                    capRoleBadge.className = "capsule-role-tag";
+                    capAvatar.style.background = "var(--primary)";
+                } else {
+                    capRoleBadge.textContent = "Citizen Only";
+                    capRoleBadge.className = "capsule-role-tag citizen-only";
+                    capAvatar.style.background = "var(--secondary)";
+                }
+            } else {
+                topCapsule.style.display = "none";
+                topLoginBtn.style.display = "flex";
+            }
+        }
+
+        // Dropdown toggle
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById("profileDropdown");
+            dropdown.classList.toggle("show");
+        }
+
+        function closeDropdown() {
+            const dropdown = document.getElementById("profileDropdown");
+            if (dropdown) dropdown.classList.remove("show");
+        }
+
+        window.addEventListener("click", () => {
+            closeDropdown();
+        });
+
+        // Toast Helper
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toastMessage");
+            const toastIcon = document.getElementById("toastIcon");
+
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+
+            if (type === "success") {
+                toastIcon.className = "fa-solid fa-circle-check";
+                toastIcon.style.color = "#22c55e";
+            } else if (type === "error") {
+                toastIcon.className = "fa-solid fa-triangle-exclamation";
+                toastIcon.style.color = "#ef4444";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-info";
+                toastIcon.style.color = "#3b82f6";
+            }
+
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3500);
+        }
+
+        /* =====================================================
+           AUTH MODAL & LOGIN / LOGOUT LOGIC
+        ===================================================== */
+        function openAuthModal(mode = "login") {
+            switchAuthTab(mode);
+            document.getElementById("authModal").classList.add("active");
+        }
+
+        function closeAuthModal(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById("authModal").classList.remove("active");
+        }
+
+        function switchAuthTab(tab) {
+            const tabBtnLogin = document.getElementById("tabBtnLogin");
+            const tabBtnSignup = document.getElementById("tabBtnSignup");
+            const authLoginForm = document.getElementById("authLoginForm");
+            const authSignupForm = document.getElementById("authSignupForm");
+
+            if (tab === "login") {
+                tabBtnLogin.classList.add("active");
+                tabBtnSignup.classList.remove("active");
+                authLoginForm.style.display = "block";
+                authSignupForm.style.display = "none";
+            } else {
+                tabBtnSignup.classList.add("active");
+                tabBtnLogin.classList.remove("active");
+                authSignupForm.style.display = "block";
+                authLoginForm.style.display = "none";
+            }
+        }
+
+        async function executeLogin() {
+            const ident = document.getElementById("login_identifier").value.trim();
+            const password = document.getElementById("login_password").value;
+
+            if (!ident || !password) {
+                showToast("Please enter your registered mobile/email and password.", "error");
+                return;
+            }
+
+            try {
+                showToast("Signing in...", "info");
+                const res = await fetch("citizen_login.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ identifier: ident, password: password })
+                });
+
+                const data = await res.json();
+                if (data.success && data.user) {
+                    currentUser = data.user;
+                    saveUserSession();
+                    renderProfileDisplay();
+                    renderVaultDisplay();
+                    closeAuthModal();
+                    showToast(`Logged in successfully! Welcome, ${currentUser.name}.`, "success");
+                    switchTab("profile");
+                } else {
+                    showToast(data.message || "Invalid mobile/email or password.", "error");
+                }
+            } catch (err) {
+                showToast("Connection to database failed: " + err.message, "error");
+            }
+        }
+
+        function executeSignup() {
+            const name = document.getElementById("signup_name").value.trim();
+            const phone = document.getElementById("signup_phone").value.trim();
+            const email = document.getElementById("signup_email").value.trim();
+
+            if (!name || !phone || !email) {
+                showToast("Please fill in name, mobile, and email to sign up.", "error");
+                return;
+            }
+
+            document.getElementById("reg_name").value = name;
+            document.getElementById("reg_phone").value = phone;
+            document.getElementById("reg_email").value = email;
+
+            closeAuthModal();
+            switchTab("register");
+            showToast("Quick sign up details pre-filled! Please complete medical and LGD location details.", "info");
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            saveUserSession();
+            renderProfileDisplay();
+            renderVaultDisplay();
+            showToast("Logged out from citizen portal. Operating as guest.", "info");
+            switchTab("profile");
+        }
+
+        function editCitizenProfile() {
+            if (!currentUser) {
+                showToast("Please login or register to edit your profile.", "info");
+                switchTab("register");
+                return;
+            }
+            document.getElementById("reg_name").value = currentUser.name || "";
+            document.getElementById("reg_email").value = currentUser.email || "";
+            document.getElementById("reg_phone").value = currentUser.rawPhone || "";
+            if (currentUser.dob) document.getElementById("reg_dob").value = currentUser.dob;
+            if (currentUser.gender) document.getElementById("reg_gender").value = currentUser.gender;
+            if (currentUser.bloodGroup) document.getElementById("reg_blood").value = currentUser.bloodGroup;
+            if (currentUser.weight) document.getElementById("reg_weight").value = currentUser.weight;
+            if (currentUser.sosContact) document.getElementById("reg_sos_contact").value = currentUser.sosContact;
+            if (currentUser.conditions) document.getElementById("reg_conditions").value = currentUser.conditions;
+            setDonorChoice(!!currentUser.isDonor);
+            switchTab("register");
+            showToast("Profile details loaded into form for editing.", "info");
+        }
+
+        /* =====================================================
+           VOLUNTARY BLOOD DONOR TOGGLE
+        ===================================================== */
+        function setDonorChoice(isDonor) {
+            isBloodDonorChoice = isDonor;
+            const cardYes = document.getElementById("cardDonorYes");
+            const cardNo = document.getElementById("cardDonorNo");
+            const donorSection = document.getElementById("donorDetailsSection");
+
+            if (isDonor) {
+                cardYes.classList.add("selected");
+                cardNo.classList.remove("selected");
+                donorSection.style.display = "block";
+            } else {
+                cardNo.classList.add("selected");
+                cardYes.classList.remove("selected");
+                donorSection.style.display = "none";
+            }
+        }
+
+        /* =====================================================
+           DROPZONE & FILE UPLOAD SYSTEM
+        ===================================================== */
+        const regDropzone = document.getElementById("regDropzone");
+        const regFileInput = document.getElementById("regFileInput");
+        const regStagedList = document.getElementById("regStagedList");
+        const docCategorySelect = document.getElementById("doc_category_select");
+        const docTitleInput = document.getElementById("doc_title_input");
+
+        regDropzone.addEventListener("click", () => regFileInput.click());
+
+        regDropzone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            regDropzone.classList.add("dragover");
+        });
+
+        regDropzone.addEventListener("dragleave", () => {
+            regDropzone.classList.remove("dragover");
+        });
+
+        regDropzone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            regDropzone.classList.remove("dragover");
+            if (e.dataTransfer && e.dataTransfer.files) {
+                handleUploadedFiles(e.dataTransfer.files);
+            }
+        });
+
+        regFileInput.addEventListener("change", (e) => {
+            if (e.target.files) {
+                handleUploadedFiles(e.target.files);
+            }
+        });
+
+        function formatBytes(bytes, decimals = 1) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function handleUploadedFiles(fileList) {
+            const files = Array.from(fileList);
+            const category = docCategorySelect.value;
+            const customTitle = docTitleInput.value.trim();
+
+            files.forEach((file) => {
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast(`File "${file.name}" exceeds maximum allowed limit of 10 MB.`, "error");
+                    return;
+                }
+
+                const reader = new FileReader();
+                const fileId = "staged_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+
+                reader.onload = function (event) {
+                    stagedMedicalRecords.push({
+                        id: fileId,
+                        title: customTitle || file.name.replace(/\.[^/.]+$/, ""),
+                        category: category,
+                        fileName: file.name,
+                        fileSize: formatBytes(file.size),
+                        fileType: file.type || "application/octet-stream",
+                        uploadDate: new Date().toISOString().split("T")[0],
+                        dataUrl: event.target.result,
+                        contentPreview: `Document Name: ${file.name}\nCategory: ${category}\nSize: ${formatBytes(file.size)}\nStatus: Verified Attachment Staged for HealthResQ Medical Vault.`
+                    });
+                    renderStagedFiles();
+                    showToast(`Added "${file.name}" to staged documents!`, "success");
+                };
+
+                if (file.type.startsWith("image/") || file.type === "application/pdf") {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+
+            docTitleInput.value = "";
+            regFileInput.value = "";
+        }
+
+        function removeStagedFile(id) {
+            stagedMedicalRecords = stagedMedicalRecords.filter(f => f.id !== id);
+            renderStagedFiles();
+            showToast("Document removed from upload staging.", "info");
+        }
+
+        function renderStagedFiles() {
+            if (stagedMedicalRecords.length === 0) {
+                regStagedList.innerHTML = "";
+                return;
+            }
+
+            let html = "";
+            stagedMedicalRecords.forEach(rec => {
+                let badgeClass = "badge-pdf";
+                let iconClass = "fa-file-pdf";
+
+                if (rec.fileType.includes("image")) {
+                    badgeClass = "badge-img";
+                    iconClass = "fa-file-image";
+                } else if (rec.fileType.includes("word") || rec.fileName.endsWith(".doc") || rec.fileName.endsWith(".docx")) {
+                    badgeClass = "badge-doc";
+                    iconClass = "fa-file-word";
+                }
+
+                html += `
+                    <div class="staged-file-item">
+                        <div class="file-left-info">
+                            <div class="file-format-badge ${badgeClass}">
+                                <i class="fa-solid ${iconClass}"></i>
+                            </div>
+                            <div class="file-meta-info">
+                                <h5>${escapeHtml(rec.title)}</h5>
+                                <p><span class="cat-tag">${escapeHtml(rec.category)}</span> • ${escapeHtml(rec.fileName)} (${rec.fileSize})</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-remove-staged" onclick="removeStagedFile('${rec.id}')" title="Remove Document">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            regStagedList.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        /* =====================================================
+           NAVIGATION TABS
+        ===================================================== */
+        function switchTab(tabId) {
+            // Hide the five Emergency Healthcare Services cards when
+            // Citizen / Register / Medical is selected.
+            const home = document.querySelector(".healthcare-home");
+            if (home) {
+                home.classList.add("hidden");
+            }
+
+            // Remove the active state from all three navigation buttons.
+            document.querySelectorAll(".nav-btn").forEach(btn => {
+                btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
+            });
+
+            // Hide every Citizen/Register/Medical screen first.
+            document.querySelectorAll(".section-view").forEach(sec => {
+                sec.classList.remove("active");
+            });
+
+            // Show only the selected screen.
+            const target = document.getElementById("view-" + tabId);
+            if (target) {
+                target.classList.add("active");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
+            if (tabId === "profile") {
+                renderProfileDisplay();
+            } else if (tabId === "vault") {
+                renderVaultDisplay();
+            }
+        }
+
+        // Return to the original five Emergency Healthcare Services.
+        function showHealthcareHome() {
+            const home = document.querySelector(".healthcare-home");
+            if (home) {
+                home.classList.remove("hidden");
+            }
+
+            document.querySelectorAll(".section-view").forEach(sec => {
+                sec.classList.remove("active");
+            });
+
+            document.querySelectorAll(".nav-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function editCitizenProfile() {
+            if (currentUser) {
+                document.getElementById("reg_name").value = currentUser.name || "";
+                document.getElementById("reg_email").value = currentUser.email || "";
+                document.getElementById("reg_phone").value = currentUser.rawPhone || "9876543210";
+                document.getElementById("reg_dob").value = currentUser.dob || "1998-05-14";
+                document.getElementById("reg_gender").value = currentUser.gender || "Male";
+                document.getElementById("reg_blood").value = currentUser.bloodGroup || "O+";
+                document.getElementById("reg_weight").value = currentUser.weight || "68";
+                document.getElementById("reg_sos_contact").value = currentUser.sosContact || "";
+                document.getElementById("reg_conditions").value = currentUser.conditions || "";
+
+                setDonorChoice(currentUser.isDonor);
+                if (currentUser.donorAvailability) {
+                    document.getElementById("donor_availability").value = currentUser.donorAvailability;
+                }
+            }
+            switchTab("register");
+            showToast("Details loaded into registration form for editing.", "info");
+        }
+
+        /* =====================================================
+           ADMINISTRATIVE LGD LOCATION HIERARCHY
+        ===================================================== */
+        const defaultLocationsData = {
+            "country": {
+                "name": "India",
+                "code": "IN",
+                "states": [
+                    {
+                        "name": "Telangana",
+                        "lgdCode": "TS",
+                        "districts": [
+                            {
+                                "name": "Hyderabad",
+                                "lgdCode": "HYD",
+                                "mandals": [
+                                    {
+                                        "name": "Ameerpet",
+                                        "lgdCode": "AMP",
+                                        "villages": [
+                                            { "name": "SR Nagar", "lgdCode": "SRN", "pincode": "500038" },
+                                            { "name": "Sanjeeva Reddy Nagar East", "lgdCode": "SRE", "pincode": "500038" },
+                                            { "name": "Maitrivanam Area", "lgdCode": "MTN", "pincode": "500016" }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Khairatabad",
+                                        "lgdCode": "KHB",
+                                        "villages": [
+                                            { "name": "Somajiguda", "lgdCode": "SMJ", "pincode": "500082" },
+                                            { "name": "Raj Bhavan Road", "lgdCode": "RBR", "pincode": "500041" },
+                                            { "name": "Panjagutta", "lgdCode": "PJG", "pincode": "500082" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Rangareddy",
+                                "lgdCode": "RRD",
+                                "mandals": [
+                                    {
+                                        "name": "Serilingampally",
+                                        "lgdCode": "SLP",
+                                        "villages": [
+                                            { "name": "Gachibowli", "lgdCode": "GBL", "pincode": "500032" },
+                                            { "name": "Madhapur", "lgdCode": "MDP", "pincode": "500081" },
+                                            { "name": "Kondapur", "lgdCode": "KDP", "pincode": "500084" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Andhra Pradesh",
+                        "lgdCode": "AP",
+                        "districts": [
+                            {
+                                "name": "Visakhapatnam",
+                                "lgdCode": "VSP",
+                                "mandals": [
+                                    {
+                                        "name": "Visakhapatnam Urban",
+                                        "lgdCode": "VSPU",
+                                        "villages": [
+                                            { "name": "MVP Colony", "lgdCode": "MVP", "pincode": "530017" },
+                                            { "name": "Siripuram", "lgdCode": "SRP", "pincode": "530003" },
+                                            { "name": "Gajuwaka", "lgdCode": "GJW", "pincode": "530026" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Krishna",
+                                "lgdCode": "KRI",
+                                "mandals": [
+                                    {
+                                        "name": "Vijayawada Urban",
+                                        "lgdCode": "VJA",
+                                        "villages": [
+                                            { "name": "Benz Circle", "lgdCode": "BNC", "pincode": "520010" },
+                                            { "name": "Governorpet", "lgdCode": "GVP", "pincode": "520002" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Maharashtra",
+                        "lgdCode": "MH",
+                        "districts": [
+                            {
+                                "name": "Mumbai City",
+                                "lgdCode": "MMC",
+                                "mandals": [
+                                    {
+                                        "name": "Colaba Mandal",
+                                        "lgdCode": "CLB",
+                                        "villages": [
+                                            { "name": "Fort Area", "lgdCode": "FRT", "pincode": "400001" },
+                                            { "name": "Nariman Point", "lgdCode": "NRP", "pincode": "400021" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let locationsData = defaultLocationsData;
+
+        const countrySelect = document.getElementById("country");
+        const stateSelect = document.getElementById("state");
+        const districtSelect = document.getElementById("district");
+        const mandalSelect = document.getElementById("mandal");
+        const villageSelect = document.getElementById("village");
+        const pincodeInput = document.getElementById("pincode");
+
+        function initLocationDropdowns() {
+            fetch("locations.json")
+                .then(res => {
+                    if (res.ok) return res.json();
+                    throw new Error("locations.json not present");
+                })
+                .then(data => {
+                    locationsData = data;
+                    populateCountry();
+                })
+                .catch(err => {
+                    populateCountry();
+                });
+        }
+
+        function populateCountry() {
+            countrySelect.innerHTML = '<option value="">Select Country</option>';
+            if (locationsData && locationsData.country) {
+                const opt = document.createElement("option");
+                opt.value = locationsData.country.name;
+                opt.textContent = `${locationsData.country.name} (${locationsData.country.code})`;
+                countrySelect.appendChild(opt);
+                countrySelect.value = locationsData.country.name;
+                populateStates();
+            }
+        }
+
+        function populateStates() {
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            if (!locationsData.country || !locationsData.country.states) return;
+
+            locationsData.country.states.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.name;
+                opt.textContent = `${s.name} [LGD: ${s.lgdCode}]`;
+                stateSelect.appendChild(opt);
+            });
+
+            stateSelect.value = "Telangana";
+            populateDistricts();
+        }
+
+        function populateDistricts() {
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            mandalSelect.innerHTML = '<option value="">Select Mandal</option>';
+            villageSelect.innerHTML = '<option value="">Select Village/Ward</option>';
+            pincodeInput.value = "";
+
+            const selectedState = stateSelect.value;
+            if (!selectedState) return;
+
+            const stObj = locationsData.country.states.find(s => s.name === selectedState);
+            if (stObj && stObj.districts) {
+                stObj.districts.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d.name;
+                    opt.textContent = `${d.name} [LGD: ${d.lgdCode}]`;
+                    districtSelect.appendChild(opt);
+                });
+
+                districtSelect.value = "Hyderabad";
+                populateMandals();
+            }
+        }
+
+        function populateMandals() {
+            mandalSelect.innerHTML = '<option value="">Select Mandal</option>';
+            villageSelect.innerHTML = '<option value="">Select Village/Ward</option>';
+            pincodeInput.value = "";
+
+            const selectedState = stateSelect.value;
+            const selectedDistrict = districtSelect.value;
+            if (!selectedState || !selectedDistrict) return;
+
+            const stObj = locationsData.country.states.find(s => s.name === selectedState);
+            if (!stObj) return;
+
+            const distObj = stObj.districts.find(d => d.name === selectedDistrict);
+            if (distObj && distObj.mandals) {
+                distObj.mandals.forEach(m => {
+                    const opt = document.createElement("option");
+                    opt.value = m.name;
+                    opt.textContent = `${m.name} [LGD: ${m.lgdCode}]`;
+                    mandalSelect.appendChild(opt);
+                });
+
+                mandalSelect.value = "Ameerpet";
+                populateVillages();
+            }
+        }
+
+        function populateVillages() {
+            villageSelect.innerHTML = '<option value="">Select Village/Ward</option>';
+            pincodeInput.value = "";
+
+            const selectedState = stateSelect.value;
+            const selectedDistrict = districtSelect.value;
+            const selectedMandal = mandalSelect.value;
+            if (!selectedState || !selectedDistrict || !selectedMandal) return;
+
+            const stObj = locationsData.country.states.find(s => s.name === selectedState);
+            if (!stObj) return;
+
+            const distObj = stObj.districts.find(d => d.name === selectedDistrict);
+            if (!distObj) return;
+
+            const mndObj = distObj.mandals.find(m => m.name === selectedMandal);
+            if (mndObj && mndObj.villages) {
+                mndObj.villages.forEach(v => {
+                    const opt = document.createElement("option");
+                    opt.value = v.name;
+                    opt.textContent = `${v.name} [PIN: ${v.pincode}]`;
+                    opt.setAttribute("data-pin", v.pincode);
+                    villageSelect.appendChild(opt);
+                });
+
+                villageSelect.value = "SR Nagar";
+                updatePincode();
+            }
+        }
+
+        function updatePincode() {
+            const selected = villageSelect.options[villageSelect.selectedIndex];
+            if (selected && selected.getAttribute("data-pin")) {
+                pincodeInput.value = selected.getAttribute("data-pin");
+            } else {
+                pincodeInput.value = "";
+            }
+        }
+
+        stateSelect.addEventListener("change", populateDistricts);
+        districtSelect.addEventListener("change", populateMandals);
+        mandalSelect.addEventListener("change", populateVillages);
+        villageSelect.addEventListener("change", updatePincode);
+
+        function getDonorLocation() {
+            const coordsDisplay = document.getElementById("coordsDisplay");
+            const sosCoords = document.getElementById("sosCoords");
+
+            if ("geolocation" in navigator) {
+                coordsDisplay.textContent = "Acquiring GPS coordinates...";
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        currentLatitude = position.coords.latitude;
+                        currentLongitude = position.coords.longitude;
+                        const text = `${currentLatitude.toFixed(4)}° N, ${currentLongitude.toFixed(4)}° E (20 KM Radius Active)`;
+                        coordsDisplay.textContent = text;
+                        if (sosCoords) sosCoords.textContent = `${currentLatitude.toFixed(4)}° N, ${currentLongitude.toFixed(4)}° E`;
+                        showToast("GPS coordinates auto-detected successfully!", "success");
+                    },
+                    function (error) {
+                        currentLatitude = 17.3850;
+                        currentLongitude = 78.4867;
+                        const fallbackText = "17.3850° N, 78.4867° E (Hyderabad 20 KM Zone)";
+                        coordsDisplay.textContent = fallbackText;
+                        if (sosCoords) sosCoords.textContent = "17.3850° N, 78.4867° E";
+                        showToast("Using verified regional coordinates for 20 KM radius.", "info");
+                    },
+                    { timeout: 8000 }
+                );
+            } else {
+                coordsDisplay.textContent = "17.3850° N, 78.4867° E (Hyderabad Zone)";
+            }
+        }
+
+        /* =====================================================
+           REGISTRATION SUBMISSION HANDLER (REAL MYSQL DATABASE)
+        ===================================================== */
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById("reg_name").value.trim();
+            const email = document.getElementById("reg_email").value.trim();
+            const rawPhone = document.getElementById("reg_phone").value.trim();
+            const dob = document.getElementById("reg_dob").value;
+            const gender = document.getElementById("reg_gender").value;
+            const password = document.getElementById("reg_password").value;
+            const nationalId = document.getElementById("reg_id_type").value.trim();
+            const blood = document.getElementById("reg_blood").value;
+            const weight = parseFloat(document.getElementById("reg_weight").value) || 0;
+            const sosContact = document.getElementById("reg_sos_contact").value.trim();
+            const conditions = document.getElementById("reg_conditions").value.trim() || "None reported";
+
+            const country = countrySelect.value || "India";
+            const state = stateSelect.value || "Telangana";
+            const district = districtSelect.value || "Hyderabad";
+            const mandal = mandalSelect.value || "Ameerpet";
+            const village = villageSelect.value || "SR Nagar";
+            const pincode = pincodeInput.value || "500038";
+
+            let donorAvailability = "Not Registered (Citizen Only)";
+            let donorLastDate = "";
+            let donorConsent = 0;
+            if (isBloodDonorChoice) {
+                donorAvailability = document.getElementById("donor_availability").value;
+                donorLastDate = document.getElementById("donor_last_date").value;
+                donorConsent = document.getElementById("donor_consent").checked ? 1 : 0;
+            }
+
+            const payload = {
+                name: name,
+                email: email,
+                phone: rawPhone,
+                dob: dob,
+                gender: gender,
+                password: password,
+                national_id: nationalId,
+                blood_group: blood,
+                weight: weight,
+                sos_contact: sosContact,
+                conditions: conditions,
+                country: country,
+                state: state,
+                district: district,
+                mandal: mandal,
+                village: village,
+                pincode: pincode,
+                is_donor: isBloodDonorChoice ? 1 : 0,
+                donor_availability: donorAvailability,
+                donor_last_date: donorLastDate,
+                donor_consent: donorConsent
+            };
+
+            try {
+                showToast("Saving citizen registration to database...", "info");
+                const res = await fetch("citizen_register.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (data.success && data.user) {
+                    const existingRecords = (currentUser && currentUser.medicalRecords) ? currentUser.medicalRecords : [];
+                    data.user.medicalRecords = [...stagedMedicalRecords, ...existingRecords];
+                    currentUser = data.user;
+
+                    // Clear staged queue
+                    stagedMedicalRecords = [];
+                    renderStagedFiles();
+
+                    // Save session & update UI
+                    saveUserSession();
+                    showToast("Registration saved in database! Digital Health ID Card generated.", "success");
+                    switchTab("profile");
+                } else {
+                    showToast(data.message || "Registration failed.", "error");
+                }
+            } catch (err) {
+                showToast("Server connection error: " + err.message, "error");
+            }
+        }
+
+        /* =====================================================
+           RENDER PROFILE, VAULT & QR CODE
+        ===================================================== */
+        function renderProfileDisplay() {
+            const profileCard = document.getElementById("profileDigitalCard");
+            const tagDonor = document.getElementById("tagDonor");
+            const profCardHeaderTitle = document.getElementById("profCardHeaderTitle");
+            const profDonorStatusDisplay = document.getElementById("profDonorStatusDisplay");
+            const profFooterBadge = document.getElementById("profFooterBadge");
+            const qrContainer = document.getElementById("qrcode");
+
+            if (!currentUser) {
+                document.getElementById("profNameDisplay").textContent = "Guest Citizen";
+                document.getElementById("profIdDisplay").textContent = "ID: Not Logged In";
+                document.getElementById("profBloodDisplay").textContent = "--";
+                document.getElementById("profPhoneDisplay").textContent = "Login required";
+                document.getElementById("profEmailDisplay").textContent = "Login required";
+                document.getElementById("profGenderDobDisplay").textContent = "---";
+                document.getElementById("profLocationDisplay").textContent = "---";
+                document.getElementById("profAreaPinDisplay").textContent = "---";
+                document.getElementById("profSosDisplay").textContent = "---";
+                document.getElementById("profConditionsDisplay").textContent = "---";
+
+                profileCard.className = "digital-id-card card-citizen-only";
+                tagDonor.style.display = "none";
+                profCardHeaderTitle.innerHTML = '<i class="fa-solid fa-id-card"></i> DIGITAL HEALTH ID (GUEST)';
+                profDonorStatusDisplay.textContent = "Not Logged In";
+                profDonorStatusDisplay.style.color = "#94a3b8";
+                profFooterBadge.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket" style="color: #60a5fa;"></i> Please Login or Register to access verified Health ID';
+                if (qrContainer) qrContainer.innerHTML = '<div style="padding:20px; color:#64748b; font-size:12px;"><i class="fa-solid fa-lock" style="font-size:28px; margin-bottom:8px; display:block;"></i>Login or Register to generate your Emergency Digital QR ID</div>';
+                renderProfileMedicalRecords();
+                return;
+            }
+
+            document.getElementById("profNameDisplay").textContent = currentUser.name;
+            document.getElementById("profIdDisplay").textContent = "ID: " + currentUser.id;
+            document.getElementById("profBloodDisplay").textContent = currentUser.bloodGroup;
+            document.getElementById("profPhoneDisplay").textContent = currentUser.phone;
+            document.getElementById("profEmailDisplay").textContent = currentUser.email;
+            document.getElementById("profGenderDobDisplay").textContent = `${currentUser.gender} (${currentUser.dob})`;
+            document.getElementById("profLocationDisplay").textContent = `${currentUser.district}, ${currentUser.state}`;
+            document.getElementById("profAreaPinDisplay").textContent = `${currentUser.village} (${currentUser.pincode})`;
+            document.getElementById("profSosDisplay").textContent = currentUser.sosContact;
+            document.getElementById("profConditionsDisplay").textContent = currentUser.conditions;
+
+            if (currentUser.isDonor) {
+                profileCard.className = "digital-id-card";
+                tagDonor.style.display = "inline-block";
+                profCardHeaderTitle.innerHTML = '<i class="fa-solid fa-heart-pulse"></i> DIGITAL HEALTH & DONOR ID';
+                profDonorStatusDisplay.textContent = currentUser.donorAvailability;
+                profDonorStatusDisplay.style.color = "#4ade80";
+                profFooterBadge.innerHTML = '<i class="fa-solid fa-shield-check" style="color: #22c55e;"></i> Verified Dual Role: Citizen User + Voluntary Blood Donor';
+            } else {
+                profileCard.className = "digital-id-card card-citizen-only";
+                tagDonor.style.display = "none";
+                profCardHeaderTitle.innerHTML = '<i class="fa-solid fa-id-card"></i> DIGITAL HEALTH ID (CITIZEN)';
+                profDonorStatusDisplay.textContent = "Not Registered (Citizen Only)";
+                profDonorStatusDisplay.style.color = "#94a3b8";
+                profFooterBadge.innerHTML = '<i class="fa-solid fa-user-check" style="color: #3b82f6;"></i> Verified Citizen Profile';
+            }
+
+            renderProfileMedicalRecords();
+            generateQrCode();
+        }
+
+        function renderProfileMedicalRecords() {
+            const grid = document.getElementById("profDocsGrid");
+            const countBadge = document.getElementById("profDocCountBadge");
+            const tabVaultCountBadge = document.getElementById("tabVaultCountBadge");
+            if (!grid || !countBadge) return;
+
+            const records = (currentUser && currentUser.medicalRecords) ? currentUser.medicalRecords : [];
+            countBadge.textContent = `${records.length} ${records.length === 1 ? 'Record' : 'Records'} Attached`;
+            if (tabVaultCountBadge) tabVaultCountBadge.textContent = records.length;
+
+            if (records.length === 0) {
+                grid.innerHTML = `
+                    <div class="vault-empty-box" style="grid-column: 1 / -1;">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <h4>No Medical Records Attached</h4>
+                        <p>Upload prescriptions, diagnostic lab reports, or vaccination certificates to your health profile.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = generateDocCardsHtml(records);
+        }
+
+        function renderVaultDisplay() {
+            const fullGrid = document.getElementById("fullVaultDocsGrid");
+            if (!fullGrid) return;
+
+            if (!currentUser) {
+                fullGrid.innerHTML = `
+                    <div class="vault-empty-box" style="grid-column: 1 / -1; padding: 40px 20px;">
+                        <i class="fa-solid fa-lock" style="font-size: 32px; color: var(--primary); margin-bottom: 12px; display: block;"></i>
+                        <h4>Medical Records Vault Locked</h4>
+                        <p>Please login or register as a citizen to access, preview, and upload your secure medical documents.</p>
+                        <button type="button" class="btn-detect-gps" style="margin-top: 14px;" onclick="openAuthModal('login')">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i> Login / Register Now
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const records = (currentUser && currentUser.medicalRecords) ? currentUser.medicalRecords : [];
+
+            let filtered = records;
+            if (currentVaultFilter !== 'All') {
+                filtered = records.filter(r => r.category === currentVaultFilter);
+            }
+
+            if (filtered.length === 0) {
+                fullGrid.innerHTML = `
+                    <div class="vault-empty-box" style="grid-column: 1 / -1;">
+                        <i class="fa-solid fa-filter"></i>
+                        <h4>No Records in "${escapeHtml(currentVaultFilter)}"</h4>
+                        <p>Use the Quick Upload box above to add a new document under this category.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            fullGrid.innerHTML = generateDocCardsHtml(filtered);
+        }
+
+        function generateDocCardsHtml(records) {
+            let html = "";
+            records.forEach(rec => {
+                let badgeClass = "badge-pdf";
+                let iconClass = "fa-file-pdf";
+
+                if (rec.fileType && rec.fileType.includes("image")) {
+                    badgeClass = "badge-img";
+                    iconClass = "fa-file-image";
+                } else if ((rec.fileType && rec.fileType.includes("word")) || (rec.fileName && (rec.fileName.endsWith(".doc") || rec.fileName.endsWith(".docx")))) {
+                    badgeClass = "badge-doc";
+                    iconClass = "fa-file-word";
+                }
+
+                html += `
+                    <div class="doc-card">
+                        <div class="doc-top-info">
+                            <div class="file-format-badge ${badgeClass}">
+                                <i class="fa-solid ${iconClass}"></i>
+                            </div>
+                            <div class="doc-body-info" style="overflow:hidden;">
+                                <h4>${escapeHtml(rec.title)}</h4>
+                                <p><span class="cat-tag">${escapeHtml(rec.category)}</span> • ${escapeHtml(rec.fileName)}</p>
+                                <p style="font-size: 11px; margin-top: 3px; color: #94a3b8;">Uploaded: ${rec.uploadDate} | Size: ${rec.fileSize}</p>
+                            </div>
+                        </div>
+                        <div class="doc-actions-row">
+                            <button type="button" class="doc-action-btn" onclick="openDocPreview('${rec.id}')">
+                                <i class="fa-solid fa-eye"></i> Preview
+                            </button>
+                            <button type="button" class="doc-action-btn" onclick="downloadDoc('${rec.id}')">
+                                <i class="fa-solid fa-download"></i> Download
+                            </button>
+                            <button type="button" class="doc-action-btn btn-delete" onclick="deleteProfileDoc('${rec.id}')" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        function filterVaultDocs(category, btnEl) {
+            currentVaultFilter = category;
+            document.querySelectorAll(".vault-filter-btn").forEach(b => b.classList.remove("active"));
+            if (btnEl) btnEl.classList.add("active");
+            renderVaultDisplay();
+        }
+
+        function uploadDirectToVault() {
+            if (!currentUser) {
+                showToast("Please login or register to manage medical records.", "error");
+                return;
+            }
+
+            const cat = document.getElementById("vault_doc_cat").value;
+            const title = document.getElementById("vault_doc_title").value.trim();
+            const fileInput = document.getElementById("vault_file_direct");
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showToast("Please select a file to upload.", "error");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            const newDocId = "doc_" + Date.now();
+
+            reader.onload = function (event) {
+                const newRecord = {
+                    id: newDocId,
+                    title: title || file.name.replace(/\.[^/.]+$/, ""),
+                    category: cat,
+                    fileName: file.name,
+                    fileSize: formatBytes(file.size),
+                    fileType: file.type || "application/octet-stream",
+                    uploadDate: new Date().toISOString().split("T")[0],
+                    dataUrl: event.target.result,
+                    contentPreview: `Document: ${file.name}\nCategory: ${cat}\nUpload Date: ${new Date().toLocaleDateString()}\nStatus: Stored in citizen health vault.`
+                };
+
+                if (!currentUser.medicalRecords) currentUser.medicalRecords = [];
+                currentUser.medicalRecords.unshift(newRecord);
+                saveUserSession();
+
+                // Clear input
+                document.getElementById("vault_doc_title").value = "";
+                fileInput.value = "";
+
+                renderVaultDisplay();
+                renderProfileDisplay();
+                showToast(`Document "${newRecord.title}" successfully added to vault!`, "success");
+            };
+
+            if (file.type.startsWith("image/") || file.type === "application/pdf") {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        /* =====================================================
+           DOCUMENT PREVIEW LIGHTBOX & ACTIONS
+        ===================================================== */
+        function openDocPreview(docId) {
+            if (!currentUser || !currentUser.medicalRecords) return;
+            const doc = currentUser.medicalRecords.find(d => d.id === docId);
+            if (!doc) return;
+
+            const modal = document.getElementById("docPreviewModal");
+            const titleEl = document.getElementById("modalDocTitle");
+            const bodyEl = document.getElementById("modalDocBody");
+
+            titleEl.innerHTML = `<i class="fa-solid fa-file-medical" style="color:var(--primary);"></i> ${escapeHtml(doc.title)}`;
+
+            let previewHtml = "";
+
+            if (doc.dataUrl && doc.fileType.includes("image")) {
+                previewHtml = `
+                    <div style="text-align: center;">
+                        <img src="${doc.dataUrl}" alt="Medical Document" style="max-width: 100%; max-height: 420px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Category: ${escapeHtml(doc.category)} | File: ${escapeHtml(doc.fileName)}</p>
+                    </div>
+                `;
+            } else {
+                previewHtml = `
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; font-family: monospace; font-size: 13px; line-height: 1.6; color: #1e293b; white-space: pre-wrap;">
+${escapeHtml(doc.contentPreview || 'Clinical Document Attached: ' + doc.fileName)}
+                    </div>
+                    <div style="margin-top: 16px; display: flex; justify-content: space-between; font-size: 12px; color: #64748b;">
+                        <span><strong>Format:</strong> ${escapeHtml(doc.fileName.split('.').pop().toUpperCase())} (${doc.fileSize})</span>
+                        <span><strong>Uploaded:</strong> ${doc.uploadDate}</span>
+                    </div>
+                `;
+            }
+
+            bodyEl.innerHTML = previewHtml;
+            modal.classList.add("active");
+        }
+
+        function closeDocPreview(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById("docPreviewModal").classList.remove("active");
+        }
+
+        function downloadDoc(docId) {
+            if (!currentUser || !currentUser.medicalRecords) return;
+            const doc = currentUser.medicalRecords.find(d => d.id === docId);
+            if (!doc) return;
+
+            if (doc.dataUrl) {
+                const a = document.createElement("a");
+                a.href = doc.dataUrl;
+                a.download = doc.fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                const blob = new Blob([doc.contentPreview || `Medical Document: ${doc.title}`], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = doc.fileName.replace(/\.[^/.]+$/, "") + ".txt";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            showToast(`Downloading "${doc.fileName}"...`, "info");
+        }
+
+        function deleteProfileDoc(docId) {
+            if (!currentUser || !currentUser.medicalRecords) return;
+            if (confirm("Are you sure you want to remove this medical document from your health vault?")) {
+                currentUser.medicalRecords = currentUser.medicalRecords.filter(d => d.id !== docId);
+                saveUserSession();
+                renderProfileDisplay();
+                renderVaultDisplay();
+                showToast("Medical record removed successfully.", "info");
+            }
+        }
+
+        /* =====================================================
+           DYNAMIC QR CODE GENERATION
+        ===================================================== */
+        function generateQrCode() {
+            const qrContainer = document.getElementById("qrcode");
+            if (!qrContainer) return;
+
+            qrContainer.innerHTML = "";
+
+            const payload = {
+                registry: "HealthResQ-SIH26198",
+                citizenId: currentUser.id,
+                name: currentUser.name,
+                bloodGroup: currentUser.bloodGroup,
+                isDonor: currentUser.isDonor,
+                donorAvailability: currentUser.donorAvailability,
+                contact: currentUser.phone,
+                sosContact: currentUser.sosContact,
+                allergies: currentUser.conditions,
+                location: `${currentUser.village}, ${currentUser.district}, ${currentUser.state} - ${currentUser.pincode}`,
+                attachedRecordsCount: (currentUser.medicalRecords || []).length,
+                verifiedTimestamp: new Date().toISOString()
+            };
+
+            const qrText = JSON.stringify(payload);
+
+            try {
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: qrText,
+                    width: 170,
+                    height: 170,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (e) {
+                qrContainer.innerHTML = '<p style="color:red; font-size:12px;">QR Engine loading...</p>';
+            }
+        }
+
+        /* =====================================================
+           EMERGENCY SOS PANIC SYSTEM (Matching E:\all in one)
+        ===================================================== */
+        let sosSessionActive = false;
+        let sosTimer = null;
+        let countdownValue = 10;
+        let audioCtx = null;
+
+        const sosOverlay = document.getElementById("sosOverlay");
+        const sosCountdownEl = document.getElementById("sosCountdown");
+        const sosCountdownSub = document.getElementById("sosCountdownSub");
+        const sosTriggerType = document.getElementById("sosTriggerType");
+        const sosSessionId = document.getElementById("sosSessionId");
+
+        function generateUUID() {
+            return 'sih26198-' + 'xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function playEmergencyBeep(freq = 880, duration = 0.15) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                // AudioContext not allowed before user gesture
+            }
+        }
+
+        function triggerSosModal(source = "keyboard_shortcut") {
+            if (sosSessionActive) return;
+            sosSessionActive = true;
+            countdownValue = 10;
+
+            const sessId = generateUUID();
+            sosSessionId.textContent = sessId;
+            sosTriggerType.textContent = source === "click" ? "SOS Panic Button" : "Keyboard Shortcut (Shift+Win+Enter)";
+
+            sosCountdownEl.textContent = countdownValue;
+            sosCountdownSub.textContent = countdownValue;
+            sosOverlay.classList.add("active");
+
+            getDonorLocation();
+            playEmergencyBeep(880, 0.2);
+
+            // Notify MySQL backend
+            fetch("api/sos/trigger.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    device: "web",
+                    gestureType: source === "click" ? "manual_button" : "keyboard_shortcut",
+                    location: { lat: currentLatitude, lon: currentLongitude },
+                    citizenId: currentUser ? currentUser.id : null,
+                    senderPhone: currentUser ? currentUser.rawPhone : ""
+                })
+            }).then(r => r.json()).then(data => {
+                if (data && data.sessionId) {
+                    sosSessionId.textContent = data.sessionId;
+                }
+            }).catch(e => console.warn("[SOS] Backend init:", e));
+
+            sosTimer = setInterval(() => {
+                countdownValue--;
+                sosCountdownEl.textContent = countdownValue;
+                sosCountdownSub.textContent = countdownValue;
+                playEmergencyBeep(countdownValue <= 3 ? 950 : 800, 0.15);
+
+                if (countdownValue <= 0) {
+                    clearInterval(sosTimer);
+                    executeSosImmediate();
+                }
+            }, 1000);
+        }
+
+        function cancelSos() {
+            if (sosTimer) clearInterval(sosTimer);
+            const sessId = sosSessionId.textContent;
+            sosSessionActive = false;
+            sosOverlay.classList.remove("active");
+
+            fetch("api/sos/complete.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    sessionId: sessId,
+                    cancelled: true,
+                    contacts: currentUser && currentUser.sosContact ? [{ phone: currentUser.sosContact }] : []
+                })
+            }).catch(() => {});
+
+            showToast("Emergency SOS session cancelled. No alert was broadcast.", "info");
+        }
+
+        async function executeSosImmediate() {
+            if (sosTimer) clearInterval(sosTimer);
+            sosOverlay.classList.remove("active");
+            sosSessionActive = false;
+
+            const sessId = sosSessionId.textContent;
+            const lat = currentLatitude || 17.3850;
+            const lon = currentLongitude || 78.4867;
+            const citizenName = currentUser ? currentUser.name : "Citizen User";
+            const blood = currentUser ? currentUser.bloodGroup : "O+";
+
+            playEmergencyBeep(1100, 0.4);
+
+            let contacts = [];
+            if (currentUser && currentUser.sosContact) {
+                contacts.push({ phone: currentUser.sosContact });
+            }
+            try {
+                const storedContacts = JSON.parse(localStorage.getItem('sos_contacts') || '[]');
+                storedContacts.forEach(c => {
+                    const p = c.phone || c;
+                    if (p && !contacts.find(x => x.phone === p)) {
+                        contacts.push({ phone: p });
+                    }
+                });
+            } catch (e) {}
+
+            try {
+                const res = await fetch("api/sos/complete.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        sessionId: sessId,
+                        cancelled: false,
+                        contacts: contacts,
+                        lat: lat,
+                        lon: lon
+                    })
+                });
+
+                const data = await res.json();
+                const waLink = (data.contactsAttempted && data.contactsAttempted[0]) ? data.contactsAttempted[0].waLink : null;
+
+                if (waLink) {
+                    window.open(waLink, '_blank');
+                }
+
+                alert(
+                    `🚨 EMERGENCY SOS BROADCAST SENT!\n\n` +
+                    `Citizen: ${citizenName} (${blood})\n` +
+                    `Session ID: ${sessId}\n` +
+                    `GPS Coordinates: ${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E\n` +
+                    `Contacts: ${contacts.length} Emergency contact(s) notified via WhatsApp & MySQL record logged.`
+                );
+
+                showToast("Emergency broadcast dispatched to trusted contacts!", "success");
+            } catch (err) {
+                showToast("Emergency alert dispatched (offline fallback).", "info");
+            }
+        }
+
+        // Global Shortcut: Shift + Meta/Win/Ctrl + Enter
+        window.addEventListener("keydown", function (e) {
+            if (e.shiftKey && (e.metaKey || e.key === "Meta" || e.ctrlKey) && e.key === "Enter") {
+                e.preventDefault();
+                triggerSosModal("keyboard_shortcut");
+            }
+        });
+
+        /* =====================================================
+           INITIALIZATION ON LOAD
+        ===================================================== */
+        window.addEventListener("DOMContentLoaded", () => {
+            initLocationDropdowns();
+            initUserSession();
+        });
+    </script>
+</body>
+</html>

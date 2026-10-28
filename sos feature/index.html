@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency SOS & Panic Beacon | HealthResQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #0b0f19;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Navigation Bar ────────────────────────────── */
+    .top-nav {
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: #f87171; }
+    .portal-brand {
+      font-weight: 800;
+      font-size: 16px;
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Citizen Info Notice ────────────────────────── */
+    #citizen-notice {
+      display: none;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 10px 18px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      margin: 16px auto 0;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    /* ── SOS Button Main Stage ─────────────────────── */
+    #main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      gap: 20px;
+      flex: 1;
+    }
+    #sos-btn {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff4d4d, #b91c1c);
+      border: 6px solid #ef4444;
+      color: #fff;
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      cursor: pointer;
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.5);
+      transition: transform .15s, box-shadow .2s;
+      animation: pulseBtn 2s infinite alternate;
+    }
+    @keyframes pulseBtn {
+      from { box-shadow: 0 0 35px rgba(239, 68, 68, 0.4); }
+      to { box-shadow: 0 0 70px rgba(239, 68, 68, 0.7); }
+    }
+    #sos-btn:active { transform: scale(.95); }
+    .hint {
+      font-size: .85rem;
+      color: #94a3b8;
+      text-align: center;
+    }
+    kbd {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #f3f4f6;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    /* ── Full-Screen Countdown Overlay ─────────────── */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(185, 28, 28, 0.96);
+      backdrop-filter: blur(10px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      z-index: 9999;
+      padding: 20px;
+      text-align: center;
+    }
+    #overlay.active { display: flex; }
+    #overlay h1 { font-size: 3rem; letter-spacing: 4px; color: #fff; }
+    #countdown {
+      font-size: 7.5rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+      line-height: 1;
+    }
+    #overlay p {
+      color: #fecdd3;
+      font-size: 1.15rem;
+      max-width: 440px;
+      line-height: 1.5;
+    }
+    #cancel-btn {
+      padding: 14px 44px;
+      background: #fff;
+      color: #b91c1c;
+      border: none;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: transform 0.15s, background 0.2s;
+    }
+    #cancel-btn:hover {
+      background: #f1f5f9;
+      transform: scale(1.03);
+    }
+
+    /* ── Status Panel ──────────────────────────────── */
+    #status-panel {
+      display: none;
+      background: #131c2e;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 22px;
+      max-width: 500px;
+      width: 90%;
+      margin: 10px auto 20px;
+    }
+    #status-panel h3 {
+      margin-bottom: 14px;
+      color: #38bdf8;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #status-list { list-style: none; }
+    #status-list li {
+      padding: 9px 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: .88rem;
+      line-height: 1.4;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    #status-list li.error { color: #f87171; }
+    #status-list li.ok   { color: #4ade80; }
+    .wa-action-btn {
+      display: inline-block;
+      background: #25D366;
+      color: #fff;
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-left: auto;
+      transition: background 0.15s;
+    }
+    .wa-action-btn:hover { background: #1eb857; }
+
+    /* ── Configuration Panel ───────────────────────── */
+    #config {
+      max-width: 500px;
+      width: 90%;
+      margin: 0 auto 40px;
+      background: #131c2e;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 24px;
+    }
+    #config h2 {
+      margin-bottom: 16px;
+      font-size: 1.15rem;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    label { display: block; font-size: .8rem; color: #94a3b8; margin: 12px 0 4px; font-weight: 600; }
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid #334155; background: #0b0f19; color: #f1f5f9; font-size: .9rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: #ef4444; }
+    button.primary {
+      margin-top: 18px; width: 100%; padding: 12px;
+      background: #ef4444; color: #fff; border: none;
+      border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    button.primary:hover { background: #dc2626; }
+    #contact-list { list-style: none; margin-top: 10px; }
+    #contact-list li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 0; font-size: .88rem; border-bottom: 1px solid #1e293b;
+    }
+    #contact-list li button {
+      background: none; border: 1px solid #475569; color: #94a3b8;
+      border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: .75rem;
+      transition: all 0.2s;
+    }
+    #contact-list li button:hover { border-color: #ef4444; color: #ef4444; }
+    .row { display: flex; gap: 8px; }
+    .row input { flex: 1; }
+    .row button {
+      flex-shrink: 0; padding: 10px 16px; background: #3b82f6;
+      color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;
+    }
+    .row button:hover { background: #2563eb; }
+
+    /* WhatsApp badge */
+    .wa-badge {
+      display: inline-block; background: #25D366; color: #fff;
+      border-radius: 6px; padding: 2px 8px; font-size: .75rem; margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation Header ──────────────────────────────────────────── -->
+<header class="top-nav">
+  <a href="../index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Healthcare Portal</a>
+  <div class="portal-brand"><i class="fa-solid fa-shield-heart"></i> HealthResQ SOS</div>
+</header>
+
+<div id="citizen-notice"></div>
+
+<!-- ── SOS Trigger Button ─────────────────────────────────────────── -->
+<div id="main">
+  <button id="sos-btn">SOS</button>
+  <p class="hint">Testing shortcut: <kbd>Shift</kbd> + <kbd>Win/Ctrl</kbd> + <kbd>Enter</kbd></p>
+  <div id="status-panel">
+    <h3><i class="fa-solid fa-satellite-dish"></i> Status Broadcast</h3>
+    <ul id="status-list"></ul>
+  </div>
+</div>
+
+<!-- ── Full-screen countdown overlay ─────────────────────────────── -->
+<div id="overlay">
+  <h1>🚨 CRITICAL SOS</h1>
+  <div id="countdown">10</div>
+  <p>Transmitting emergency alert with your live GPS location to trusted contacts & responders…<br>Press cancel immediately to abort.</p>
+  <button id="cancel-btn">CANCEL SOS</button>
+</div>
+
+<!-- ── Configuration panel ────────────────────────────────────────── -->
+<div id="config">
+  <h2>⚙️ SOS Settings <span class="wa-badge"><i class="fa-brands fa-whatsapp"></i> WhatsApp</span></h2>
+
+  <label>Countdown seconds</label>
+  <input id="countdown-cfg" type="number" value="10" min="5" max="60" />
+
+  <label>API Base URL (your PHP XAMPP server)</label>
+  <input id="api-url" type="text" placeholder="/HEALTHCARE" />
+
+  <label>Your WhatsApp number (E.164, e.g. +919876543210)</label>
+  <input id="sender-phone" type="text" placeholder="+919876543210" />
+
+  <label>Mode</label>
+  <select id="mode">
+    <option value="testing">Testing (Keyboard shortcut + Click)</option>
+    <option value="production">Production (Hardware gesture / Native WebView)</option>
+  </select>
+
+  <label>Trusted contacts (WhatsApp numbers, E.164)</label>
+  <div class="row">
+    <input id="new-phone" type="tel" placeholder="+919876543210" />
+    <button id="add-contact">Add Contact</button>
+  </div>
+  <ul id="contact-list"></ul>
+
+  <button class="primary" id="save-config">Save Settings</button>
+</div>
+
+<script type="module">
+import { SosController } from './sos.js';
+window.__sosCtrl = new SosController();
+window.__sosCtrl.init();
+</script>
+</body>
+</html>

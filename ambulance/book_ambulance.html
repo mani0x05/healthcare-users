@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Book Ambulance</title>
+
+<link rel="stylesheet"
+href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+<style>
+
+.booking-container{
+    width:90%;
+    max-width:700px;
+    margin:35px auto;
+}
+
+.booking-box{
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.booking-box h2{
+    text-align:center;
+    color:#d90429;
+    margin-bottom:25px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-top:18px;
+    margin-bottom:7px;
+}
+
+input,
+select{
+    width:100%;
+    padding:13px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+}
+
+.location-box{
+    display:flex;
+    gap:10px;
+}
+
+.location-box input{
+    flex:1;
+}
+
+.location-btn{
+    background:#333;
+    color:white;
+    border:none;
+    padding:0 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.book-btn{
+    width:100%;
+    margin-top:25px;
+    padding:15px;
+    background:#d90429;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.book-btn:hover{
+    background:#b80322;
+}
+
+.book-btn:disabled{
+    background:#888;
+    cursor:not-allowed;
+}
+
+.result{
+    display:none;
+    margin-top:25px;
+    padding:20px;
+    background:#eefaf0;
+    border-left:5px solid green;
+    border-radius:10px;
+}
+
+.driver-details{
+    display:none;
+    margin-top:20px;
+    padding:20px;
+    background:white;
+    border:2px solid #28a745;
+    border-radius:12px;
+}
+
+.driver-details h3{
+    color:#28a745;
+    margin-bottom:15px;
+}
+
+.driver-details p{
+    margin:10px 0;
+}
+
+.driver-phone{
+    color:#007bff;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.track-btn{
+    display:block;
+    margin-top:15px;
+    text-align:center;
+    background:#111;
+    color:white;
+    padding:12px;
+    border-radius:8px;
+    text-decoration:none;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>🚑 Book Ambulance</h1>
+
+<p>Emergency Ambulance Booking</p>
+
+</header>
+
+
+
+<div class="booking-container">
+
+<div class="booking-box">
+
+
+<h2>
+
+<i class="fa-solid fa-truck-medical"></i>
+
+Request Ambulance
+
+</h2>
+
+
+
+<!-- =========================
+     EMERGENCY TYPE
+========================= -->
+
+<label>
+
+Emergency Type
+
+</label>
+
+
+<select id="emergencyType">
+
+<option value="Accident">
+
+🚨 Accident
+
+</option>
+
+<option value="Medical Emergency">
+
+🏥 Medical Emergency
+
+</option>
+
+<option value="Critical Patient">
+
+❤️ Critical Patient
+
+</option>
+
+<option value="Other Emergency">
+
+⚠️ Other Emergency
+
+</option>
+
+</select>
+
+
+
+<!-- =========================
+     PICKUP LOCATION
+========================= -->
+
+<label>
+
+Pickup Location
+
+</label>
+
+
+<div class="location-box">
+
+
+<input
+type="text"
+id="location"
+placeholder="Enter pickup location"
+autocomplete="off">
+
+
+<button
+class="location-btn"
+onclick="getLocation()">
+
+<i class="fa-solid fa-location-crosshairs"></i>
+
+</button>
+
+
+</div>
+
+
+
+<!-- =========================
+     CONTACT NUMBER
+========================= -->
+
+<label>
+
+Contact Number
+
+</label>
+
+
+<input
+type="tel"
+id="phone"
+placeholder="Enter contact number"
+maxlength="10"
+autocomplete="tel">
+
+
+
+<!-- =========================
+     BOOK BUTTON
+========================= -->
+
+<button
+class="book-btn"
+onclick="bookAmbulance()">
+
+🚑 REQUEST AMBULANCE
+
+</button>
+
+
+
+<!-- =========================
+     BOOKING RESULT
+========================= -->
+
+<div
+class="result"
+id="result">
+
+
+<h3>
+
+🚑 Ambulance Request
+
+</h3>
+
+
+<p>
+
+<strong>Booking ID:</strong>
+
+<span id="bookingId"></span>
+
+</p>
+
+
+<p>
+
+<strong>Status:</strong>
+
+<span id="rideStatus">
+
+Searching for ambulance...
+
+</span>
+
+</p>
+
+
+<p>
+
+<strong>Emergency:</strong>
+
+<span id="showEmergency"></span>
+
+</p>
+
+
+<p>
+
+<strong>Pickup:</strong>
+
+<span id="showLocation"></span>
+
+</p>
+
+
+
+<!-- =========================
+     DRIVER DETAILS
+========================= -->
+
+<div
+class="driver-details"
+id="driverDetails">
+
+
+<h3>
+
+✅ Driver Accepted Your Ride
+
+</h3>
+
+
+<p>
+
+<strong>👨‍✈️ Driver Name:</strong>
+
+<span id="driverName"></span>
+
+</p>
+
+
+<p>
+
+<strong>📞 Phone:</strong>
+
+
+<a
+id="driverPhone"
+class="driver-phone"
+href="#">
+
+</a>
+
+
+</p>
+
+
+<p>
+
+<strong>🚑 Ambulance Number:</strong>
+
+<span id="ambulanceNumber"></span>
+
+</p>
+
+
+<p>
+
+<strong>🚑 Ambulance Type:</strong>
+
+<span id="ambulanceType"></span>
+
+</p>
+
+
+</div>
+
+
+
+<a
+href="track_ambulance.html"
+class="track-btn">
+
+🗺️ Track Ambulance
+
+</a>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<a
+href="ambulance.html"
+style="
+display:block;
+text-align:center;
+margin:25px;
+color:#d90429;
+font-weight:bold;
+text-decoration:none;
+">
+
+← Back to Ambulance Service
+
+</a>
+
+
+
+<script>
+
+
+/* ==================================================
+   VARIABLES
+================================================== */
+
+let pickupLatitude = null;
+
+let pickupLongitude = null;
+
+let bookingStatusInterval = null;
+
+
+
+/* ==================================================
+   PAGE LOAD
+================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        /*
+         * IMPORTANT:
+         * Remove old booking status.
+         * This prevents old accepted bookings
+         * from showing popup when page opens.
+         */
+
+  
+
+        /*
+         * Load selected driver
+         */
+
+        const selectedDriver =
+            localStorage.getItem(
+                "selected_driver_id"
+            );
+
+
+        if(!selectedDriver){
+
+            alert(
+                "No ambulance selected. Please find an ambulance first."
+            );
+
+        }
+
+
+        /*
+         * Load saved GPS location
+         */
+
+        const savedLat =
+            localStorage.getItem(
+                "user_latitude"
+            );
+
+
+        const savedLng =
+            localStorage.getItem(
+                "user_longitude"
+            );
+
+
+        if(
+            savedLat &&
+            savedLng
+        ){
+
+            pickupLatitude =
+                parseFloat(savedLat);
+
+
+            pickupLongitude =
+                parseFloat(savedLng);
+
+
+            document.getElementById(
+                "location"
+            ).value =
+
+                "Current Location (" +
+
+                pickupLatitude.toFixed(5) +
+
+                ", " +
+
+                pickupLongitude.toFixed(5) +
+
+                ")";
+
+        }
+
+    }
+);
+
+
+
+/* ==================================================
+   GET GPS LOCATION
+================================================== */
+
+function getLocation(){
+
+
+    if(!navigator.geolocation){
+
+        alert(
+            "GPS is not supported by this browser."
+        );
+
+        return;
+
+    }
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position){
+
+
+            pickupLatitude =
+                position.coords.latitude;
+
+
+            pickupLongitude =
+                position.coords.longitude;
+
+
+            document.getElementById(
+                "location"
+            ).value =
+
+                "Current Location (" +
+
+                pickupLatitude.toFixed(5) +
+
+                ", " +
+
+                pickupLongitude.toFixed(5) +
+
+                ")";
+
+
+            /*
+             * Save location
+             */
+
+            localStorage.setItem(
+                "user_latitude",
+                pickupLatitude
+            );
+
+
+            localStorage.setItem(
+                "user_longitude",
+                pickupLongitude
+            );
+
+
+        },
+
+
+        function(error){
+
+            console.log(error);
+
+
+            alert(
+                "Unable to access location. Please enable GPS."
+            );
+
+        },
+
+
+        {
+
+            enableHighAccuracy:true,
+
+            timeout:10000,
+
+            maximumAge:0
+
+        }
+
+    );
+
+}
+
+
+
+/* ==================================================
+   CHECK DRIVER ACCEPTANCE
+================================================== */
+
+function checkBookingStatus(){
+
+
+    const bookingId =
+        localStorage.getItem(
+            "booking_id"
+        );
+
+
+    /*
+     * If there is no NEW booking,
+     * don't check anything.
+     */
+
+    if(!bookingId){
+
+        return;
+
+    }
+
+
+    fetch(
+
+        "http://localhost/Healthcare%20Drivers/get_booking_status.php?booking_id="
+        + bookingId
+
+    )
+
+
+    .then(
+        response => response.json()
+    )
+
+
+    .then(
+        data => {
+
+
+            console.log(
+                "Booking Status:",
+                data
+            );
+
+
+            if(!data.success){
+
+                return;
+
+            }
+
+
+
+            /* ========================================
+               DRIVER ACCEPTED
+            ======================================== */
+
+            if(
+                data.status === "accepted"
+            ){
+
+
+                document.getElementById(
+                    "rideStatus"
+                ).innerHTML =
+
+                    "✅ Driver Accepted Your Ride";
+
+
+
+                const driver =
+                    data.driver;
+
+
+
+                if(driver){
+
+
+                    document.getElementById(
+                        "driverName"
+                    ).innerText =
+
+                        driver.name;
+
+
+
+                    document.getElementById(
+                        "driverPhone"
+                    ).innerText =
+
+                        driver.phone;
+
+
+
+                    document.getElementById(
+                        "driverPhone"
+                    ).href =
+
+                        "tel:" +
+                        driver.phone;
+
+
+
+                    document.getElementById(
+                        "ambulanceNumber"
+                    ).innerText =
+
+                        driver.ambulance_number;
+
+
+
+                    document.getElementById(
+                        "ambulanceType"
+                    ).innerText =
+
+                        driver.ambulance_type;
+
+
+
+                    document.getElementById(
+                        "driverDetails"
+                    ).style.display =
+
+                        "block";
+
+
+
+                    /*
+                     * STOP POLLING
+                     */
+
+                    clearInterval(
+                        bookingStatusInterval
+                    );
+
+
+
+                    /*
+                     * SHOW POPUP ONLY NOW
+                     */
+
+                    alert(
+
+                        "🚑 Driver accepted your ride!\n\n" +
+
+                        "Driver: " +
+
+                        driver.name +
+
+                        "\nAmbulance: " +
+
+                        driver.ambulance_number
+
+                    );
+
+                }
+
+            }
+
+        }
+
+    )
+
+
+    .catch(
+        error => {
+
+            console.error(
+                "Status check error:",
+                error
+            );
+
+        }
+    );
+
+}
+
+const savedBooking = JSON.parse(
+    localStorage.getItem("ambulanceBooking") || "{}"
+);
+
+savedBooking.status = "accepted";
+
+savedBooking.driver = {
+    name: data.driver.name,
+    phone: data.driver.phone,
+    ambulance_number: data.driver.ambulance_number,
+    ambulance_type: data.driver.ambulance_type
+};
+
+localStorage.setItem(
+    "ambulanceBooking",
+    JSON.stringify(savedBooking)
+);
+
+
+
+
+/* ==================================================
+   BOOK AMBULANCE
+================================================== */
+
+async function bookAmbulance(){
+
+
+    /* ========================================
+       GET VALUES
+    ======================================== */
+
+
+    const emergency =
+        document.getElementById(
+            "emergencyType"
+        ).value;
+
+
+    const location =
+        document.getElementById(
+            "location"
+        ).value.trim();
+
+
+    const phone =
+        document.getElementById(
+            "phone"
+        ).value.trim();
+
+
+    const driverId =
+        localStorage.getItem(
+            "selected_driver_id"
+        );
+
+
+
+    /* ========================================
+       VALIDATION
+    ======================================== */
+
+
+    if(!driverId){
+
+        alert(
+            "Please select an ambulance first."
+        );
+
+        return;
+
+    }
+
+
+
+    if(!phone){
+
+        alert(
+            "Please enter contact number."
+        );
+
+        return;
+
+    }
+
+
+
+    if(
+        !/^[6-9][0-9]{9}$/.test(phone)
+    ){
+
+        alert(
+            "Please enter a valid 10-digit Indian mobile number."
+        );
+
+        return;
+
+    }
+
+
+
+    if(!location){
+
+        alert(
+            "Please enter pickup location."
+        );
+
+        return;
+
+    }
+
+
+
+    if(
+        pickupLatitude === null ||
+        pickupLongitude === null
+    ){
+
+        alert(
+            "Please click the location button and allow GPS access."
+        );
+
+        return;
+
+    }
+
+
+
+    /* ========================================
+       BUTTON LOADING
+    ======================================== */
+
+
+    const button =
+        document.querySelector(
+            ".book-btn"
+        );
+
+
+    button.disabled = true;
+
+
+    button.innerText =
+        "🚑 SENDING REQUEST...";
+
+
+
+    /* ========================================
+       SEND BOOKING
+    ======================================== */
+
+    try{
+
+
+        const response =
+
+            await fetch(
+
+                "http://localhost/Healthcare%20Drivers/create_booking.php",
+
+                {
+
+                    method:"POST",
+
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+
+                    body:JSON.stringify({
+
+                        /*
+                         * Automatic value.
+                         * No patient-name field required.
+                         */
+
+                        patient_name:
+                            "Emergency Patient",
+
+
+                        patient_phone:
+                            phone,
+
+
+                        emergency_type:
+                            emergency,
+
+
+                        pickup_address:
+                            location,
+
+
+                        pickup_latitude:
+                            pickupLatitude,
+
+
+                        pickup_longitude:
+                            pickupLongitude,
+
+
+                        /*
+                         * No hospital required.
+                         */
+
+                        hospital_name:
+                            "",
+
+
+                        hospital_latitude:
+                            null,
+
+
+                        hospital_longitude:
+                            null,
+
+
+                        driver_id:
+                            parseInt(driverId)
+
+                    })
+
+                }
+
+            );
+
+
+
+        const result =
+            await response.json();
+
+
+
+        console.log(
+            "Booking Response:",
+            result
+        );
+
+
+
+        /* ========================================
+           BOOKING SUCCESS
+        ======================================== */
+
+
+        if(result.success){
+
+
+            /*
+             * SHOW BOOKING RESULT
+             */
+
+            document.getElementById(
+                "bookingId"
+            ).innerText =
+
+                result.booking_code;
+
+
+
+            document.getElementById(
+                "showEmergency"
+            ).innerText =
+
+                emergency;
+
+
+
+            document.getElementById(
+                "showLocation"
+            ).innerText =
+
+                location;
+
+
+
+            document.getElementById(
+                "rideStatus"
+            ).innerText =
+
+                "Searching for nearby ambulance...";
+
+
+
+            document.getElementById(
+                "result"
+            ).style.display =
+
+                "block";
+
+
+
+            /*
+             * Create booking object
+             */
+
+            const booking = {
+
+
+                booking_id:
+                    result.booking_id,
+
+
+                booking_code:
+                    result.booking_code,
+
+
+                driver_id:
+                    driverId,
+
+
+                emergency:
+                    emergency,
+
+
+                location:
+                    location,
+
+
+                latitude:
+                    pickupLatitude,
+
+
+                longitude:
+                    pickupLongitude,
+
+
+                phone:
+                    phone,
+
+
+                status:
+                    "searching"
+
+            };
+
+
+
+            localStorage.setItem(
+
+                "ambulanceBooking",
+
+                JSON.stringify(booking)
+
+            );
+
+
+
+            /*
+             * SAVE NEW BOOKING ID
+             */
+
+            localStorage.setItem(
+
+                "booking_id",
+
+                result.booking_id
+
+            );
+
+
+
+            localStorage.setItem(
+
+                "booking_code",
+
+                result.booking_code
+
+            );
+
+
+
+            /*
+             * ==================================
+             * START STATUS CHECKING
+             * ONLY AFTER BOOKING SUCCESS
+             * ==================================
+             */
+
+            clearInterval(
+                bookingStatusInterval
+            );
+
+
+            /*
+             * Check once immediately
+             */
+
+            checkBookingStatus();
+
+
+
+            /*
+             * Then check every 3 seconds
+             */
+
+            bookingStatusInterval =
+
+                setInterval(
+
+                    checkBookingStatus,
+
+                    3000
+
+                );
+
+
+
+            /*
+             * BUTTON
+             */
+
+            button.innerText =
+                "✅ REQUEST SENT";
+
+
+            button.disabled =
+                true;
+
+
+
+            /*
+             * BOOKING SUCCESS MESSAGE
+             */
+
+            alert(
+                "🚑 Ambulance request sent successfully!"
+            );
+
+        }
+
+
+        /* ========================================
+           BOOKING FAILED
+        ======================================== */
+
+        else{
+
+
+            alert(
+
+                result.message ||
+
+                "Unable to book ambulance."
+
+            );
+
+
+            button.disabled =
+                false;
+
+
+            button.innerText =
+                "🚑 REQUEST AMBULANCE";
+
+        }
+
+    }
+
+
+    /* ========================================
+       SERVER ERROR
+    ======================================== */
+
+    catch(error){
+
+
+        console.error(
+            error
+        );
+
+
+        alert(
+            "Unable to connect to ambulance server."
+        );
+
+
+        button.disabled =
+            false;
+
+
+        button.innerText =
+            "🚑 REQUEST AMBULANCE";
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Ambulance Bookings - HealthResQ</title>
+
+    <link rel="stylesheet" href="../style.css">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .booking-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .booking-header {
+            background: #d90429;
+            color: white;
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .booking-header i {
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+        .booking-card {
+            background: white;
+            padding: 25px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+
+        .section-title {
+            color: #d90429;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail strong {
+            color: #333;
+        }
+
+        .detail span {
+            text-align: right;
+            color: #555;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .status.searching {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.accepted {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .driver-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            text-decoration: none;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #d90429;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: white;
+        }
+
+        .no-booking {
+            background: white;
+            padding: 40px 25px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+
+        .no-booking i {
+            font-size: 55px;
+            color: #d90429;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .detail {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .detail span {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="booking-container">
+
+    <div id="bookingContent"></div>
+
+</div>
+
+<script>
+
+let statusTimer = null;
+
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function getBooking() {
+
+    const saved = localStorage.getItem("ambulanceBooking");
+
+    if (!saved) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(saved);
+    } catch (error) {
+        return null;
+    }
+}
+
+
+function saveBooking(booking) {
+
+    localStorage.setItem(
+        "ambulanceBooking",
+        JSON.stringify(booking)
+    );
+}
+
+
+function renderBooking(booking) {
+
+    const container = document.getElementById("bookingContent");
+
+    if (!booking) {
+
+        container.innerHTML = `
+            <div class="no-booking">
+
+                <i class="fa-solid fa-clipboard-list"></i>
+
+                <h2>No Ambulance Bookings</h2>
+
+                <p>
+                    You haven't booked an ambulance yet.
+                </p>
+
+                <div class="buttons" style="justify-content:center;">
+
+                    <a href="book_ambulance.html"
+                       class="btn btn-primary">
+                        Book Ambulance
+                    </a>
+
+                    <a href="ambulance.html"
+                       class="btn btn-secondary">
+                        Back
+                    </a>
+
+                </div>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const status = booking.status || "searching";
+
+
+    let statusClass = "searching";
+
+    if (status === "accepted") {
+        statusClass = "accepted";
+    }
+
+
+    let statusText = status;
+
+
+    if (status === "accepted") {
+        statusText = "Driver Accepted";
+    }
+    else if (status === "searching") {
+        statusText = "Searching";
+    }
+
+
+    let driverSection = "";
+
+
+    if (booking.driver) {
+
+        driverSection = `
+
+            <h3 class="section-title">
+                <i class="fa-solid fa-truck-medical"></i>
+                Driver & Ambulance Details
+            </h3>
+
+            <div class="driver-box">
+
+                <div class="detail">
+                    <strong>Driver Name</strong>
+                    <span>
+                        ${escapeHTML(
+                            booking.driver.name || "Not available"
+                        )}
+                    </span>
+                </div>
+
+                <div class="detail">
+                    <strong>Driver Phone</strong>
+                    <span>
+                        ${escapeHTML(
+                            booking.driver.phone || "Not available"
+                        )}
+                    </span>
+                </div>
+
+                <div class="detail">
+                    <strong>Ambulance Number</strong>
+                    <span>
+                        ${escapeHTML(
+                            booking.driver.ambulance_number || "Not available"
+                        )}
+                    </span>
+                </div>
+
+                <div class="detail">
+                    <strong>Ambulance Type</strong>
+                    <span>
+                        ${escapeHTML(
+                            booking.driver.ambulance_type || "Not available"
+                        )}
+                    </span>
+                </div>
+
+            </div>
+        `;
+
+    } else {
+
+        driverSection = `
+
+            <h3 class="section-title">
+                <i class="fa-solid fa-truck-medical"></i>
+                Driver & Ambulance Details
+            </h3>
+
+            <div class="driver-box">
+
+                <p id="searchMessage">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    Searching for an ambulance...
+
+                </p>
+
+            </div>
+
+        `;
+    }
+
+
+    container.innerHTML = `
+
+        <div class="booking-header">
+
+            <i class="fa-solid fa-clipboard-list"></i>
+
+            <h1>My Ambulance Booking</h1>
+
+            <p>HealthResQ</p>
+
+        </div>
+
+
+        <div class="booking-card">
+
+            <h3 class="section-title">
+
+                <i class="fa-solid fa-file-medical"></i>
+
+                Booking Details
+
+            </h3>
+
+
+            <div class="detail">
+
+                <strong>Booking ID</strong>
+
+                <span>
+                    ${escapeHTML(
+                        booking.booking_id || "N/A"
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <strong>Booking Code</strong>
+
+                <span>
+                    ${escapeHTML(
+                        booking.booking_code || "N/A"
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <strong>Status</strong>
+
+                <span>
+
+                    <span class="status ${statusClass}">
+
+                        ${escapeHTML(statusText)}
+
+                    </span>
+
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <strong>Emergency Type</strong>
+
+                <span>
+                    ${escapeHTML(
+                        booking.emergency || "N/A"
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <strong>Pickup Location</strong>
+
+                <span>
+                    ${escapeHTML(
+                        booking.location || "N/A"
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="detail">
+
+                <strong>Contact Number</strong>
+
+                <span>
+                    ${escapeHTML(
+                        booking.phone || "N/A"
+                    )}
+                </span>
+
+            </div>
+
+
+            ${driverSection}
+
+
+            <div class="buttons">
+
+                ${
+                    booking.driver
+                    ? `
+                        <a href="track_ambulance.html"
+                           class="btn btn-primary">
+
+                            <i class="fa-solid fa-location-dot"></i>
+
+                            Track Ambulance
+
+                        </a>
+                    `
+                    : ""
+                }
+
+
+                <a href="ambulance.html"
+                   class="btn btn-secondary">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    `;
+}
+
+
+/* CHECK REAL BOOKING STATUS FROM BACKEND */
+
+async function checkBookingStatus() {
+
+    const booking = getBooking();
+
+    if (!booking || !booking.booking_id) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            "http://localhost/Healthcare%20Drivers/get_booking_status.php?booking_id="
+            + encodeURIComponent(booking.booking_id),
+            {
+                cache: "no-store"
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        console.log("Booking status:", data);
+
+
+        if (data.success) {
+
+            /*
+             * Update status
+             */
+
+            booking.status = data.status;
+
+
+            /*
+             * If driver accepted,
+             * save driver details
+             */
+
+            if (
+                data.status === "accepted" &&
+                data.driver
+            ) {
+
+                booking.driver = {
+
+                    name: data.driver.name,
+
+                    phone: data.driver.phone,
+
+                    ambulance_number:
+                        data.driver.ambulance_number,
+
+                    ambulance_type:
+                        data.driver.ambulance_type
+
+                };
+
+            }
+
+
+            /*
+             * Save updated booking
+             */
+
+            saveBooking(booking);
+
+
+            /*
+             * Update screen
+             */
+
+            renderBooking(booking);
+
+
+            /*
+             * Stop checking after driver accepts
+             */
+
+            if (data.status === "accepted") {
+
+                if (statusTimer) {
+
+                    clearInterval(statusTimer);
+
+                    statusTimer = null;
+
+                }
+
+            }
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Booking status error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* FIRST LOAD */
+
+const booking = getBooking();
+
+renderBooking(booking);
+
+
+/* CHECK IMMEDIATELY */
+
+checkBookingStatus();
+
+
+/* CHECK EVERY 3 SECONDS */
+
+statusTimer = setInterval(
+    checkBookingStatus,
+    3000
+);
+
+</script>
+
+</body>
+</html>

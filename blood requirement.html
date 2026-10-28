@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blood Requirement</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🩸 Blood Requirement</h1>
+    <p>Request blood quickly during an emergency</p>
+</header>
+
+<div class="container">
+
+    <div class="card form-card">
+
+        <form action="find_donors.php" method="POST">
+
+            <label>Patient Name</label>
+            <input type="text" name="patient_name"
+                   placeholder="Enter patient name" required>
+
+            <label>Blood Group Required</label>
+            <select name="blood_group" required>
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+
+            <label>Hospital Name</label>
+            <input type="text" name="hospital_name"
+                   placeholder="Enter hospital name" required>
+
+            <label>Units Required</label>
+            <input type="number" name="units"
+                   min="1" placeholder="Number of units" required>
+
+            <label>City / Area</label>
+            <input type="text" name="city"
+                   placeholder="Enter city or area" required>
+
+            <label>Contact Number</label>
+            <input type="tel" name="contact"
+                   pattern="[0-9]{10}"
+                   maxlength="10"
+                   placeholder="10-digit mobile number" required>
+
+            <label>Additional Information</label>
+            <textarea name="additional_info"
+                      rows="4"
+                      placeholder="Enter any additional information"></textarea>
+
+            <button type="submit">
+                <i class="fa-solid fa-droplet"></i>
+                Find Available Donors
+            </button>
+
+        </form>
+
+        <br>
+
+        <a href="blood.html">← Back to Blood Services</a>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 Emergency Healthcare Assistance
+</footer>
+
+</body>
+</html>

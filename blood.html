@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Blood Availability</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f5f7fa;
+}
+
+header {
+    background: #c1121f;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.2);
+    text-align: center;
+}
+
+h2 {
+    color: #c1121f;
+    margin-bottom: 20px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #c1121f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #900c16;
+}
+
+.location-status {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f5f5f5;
+    font-size: 14px;
+}
+
+.location-success {
+    color: green;
+}
+
+.location-error {
+    color: #c1121f;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>🩸 Blood Requirement</h1>
+
+</header>
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h2>Need Blood?</h2>
+
+
+<form action="find_donors.php" method="POST" id="bloodForm">
+
+
+<!-- Patient location will be stored here -->
+
+<input
+    type="hidden"
+    name="latitude"
+    id="patient_latitude"
+>
+
+<input
+    type="hidden"
+    name="longitude"
+    id="patient_longitude"
+>
+
+
+<input
+    type="text"
+    name="patient_name"
+    placeholder="Patient Name"
+    required
+>
+
+
+<input
+    type="text"
+    name="hospital_name"
+    placeholder="Hospital Name"
+    required
+>
+
+
+<input
+    type="text"
+    name="city"
+    placeholder="City Name"
+    required
+>
+
+
+<select name="blood_group" required>
+
+<option value="">
+Select Blood Group
+</option>
+
+<option value="A+">A+</option>
+
+<option value="A-">A-</option>
+
+<option value="B+">B+</option>
+
+<option value="B-">B-</option>
+
+<option value="AB+">AB+</option>
+
+<option value="AB-">AB-</option>
+
+<option value="O+">O+</option>
+
+<option value="O-">O-</option>
+
+</select>
+
+
+<input
+    type="number"
+    name="units"
+    placeholder="Units Required"
+    min="1"
+    required
+>
+
+
+<input
+    type="tel"
+    name="contact"
+    id="contact"
+    placeholder="Enter 10-digit mobile number"
+    maxlength="10"
+    minlength="10"
+    pattern="[0-9]{10}"
+    inputmode="numeric"
+    required
+>s
+
+
+<div
+    id="locationStatus"
+    class="location-status"
+>
+
+Getting your location...
+
+</div>
+
+
+<button type="submit">
+
+Submit Requirement
+
+</button>
+
+
+</form>
+
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/*
+    Get patient's current location
+*/
+
+const latitudeInput =
+    document.getElementById("patient_latitude");
+
+const longitudeInput =
+    document.getElementById("patient_longitude");
+
+const locationStatus =
+    document.getElementById("locationStatus");
+
+const bloodForm =
+    document.getElementById("bloodForm");
+
+
+function getPatientLocation() {
+
+    /*
+        Check whether browser supports
+        location services.
+    */
+
+    if (!navigator.geolocation) {
+
+        locationStatus.innerHTML =
+            "❌ Location services are not supported by your browser.";
+
+        locationStatus.classList.add("location-error");
+
+        return;
+
+    }
+
+
+    locationStatus.innerHTML =
+        "📍 Getting your location...";
+
+
+    /*
+        Ask browser for current location.
+    */
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            /*
+                Location successfully received.
+            */
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+
+            /*
+                Put location into hidden
+                form fields.
+            */
+
+            latitudeInput.value =
+                latitude;
+
+            longitudeInput.value =
+                longitude;
+
+
+            locationStatus.innerHTML =
+                "✅ Location detected. Donors within 20 KM will be searched.";
+
+            locationStatus.classList.add("location-success");
+
+
+            console.log(
+                "Patient Latitude:",
+                latitude
+            );
+
+            console.log(
+                "Patient Longitude:",
+                longitude
+            );
+
+        },
+
+
+        function(error) {
+
+            /*
+                Location could not be obtained.
+            */
+
+            latitudeInput.value = "";
+
+            longitudeInput.value = "";
+
+
+            if (error.code === 1) {
+
+                locationStatus.innerHTML =
+                    "❌ Location permission denied. Please allow location access.";
+
+            }
+            else if (error.code === 2) {
+
+                locationStatus.innerHTML =
+                    "❌ Unable to determine your location.";
+
+            }
+            else if (error.code === 3) {
+
+                locationStatus.innerHTML =
+                    "❌ Location request timed out.";
+
+            }
+            else {
+
+                locationStatus.innerHTML =
+                    "❌ Unable to get your location.";
+
+            }
+
+
+            locationStatus.classList.add("location-error");
+
+        },
+
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+
+    );
+
+}
+
+
+/*
+    Get location when page opens.
+*/
+
+window.addEventListener(
+    "load",
+    getPatientLocation
+);
+
+
+/*
+    Before submitting the form,
+    make sure location was received.
+*/
+
+bloodForm.addEventListener(
+    "submit",
+    function(event) {
+
+        if (
+            latitudeInput.value === "" ||
+            longitudeInput.value === ""
+        ) {
+
+            event.preventDefault();
+
+
+            alert(
+                "Please allow location access first. " +
+                "Your location is required to find donors within 20 KM."
+            );
+
+
+            getPatientLocation();
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>

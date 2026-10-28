@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Nearby Ambulances</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+
+.container{
+    width:90%;
+    max-width:900px;
+    margin:35px auto;
+}
+
+.location{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.1);
+    text-align:center;
+}
+
+.location button{
+    background:#d90429;
+    color:white;
+    border:none;
+    padding:13px 20px;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.location button:hover{
+    background:#b80322;
+}
+
+#locationStatus{
+    margin-top:15px;
+    color:#555;
+}
+
+.ambulances{
+    margin-top:25px;
+}
+
+.ambulance{
+    background:white;
+    margin:15px 0;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 7px 18px rgba(0,0,0,.1);
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.ambulance i{
+    font-size:40px;
+    color:#d90429;
+}
+
+.info{
+    flex:1;
+    margin-left:20px;
+}
+
+.info h3{
+    margin:0 0 8px;
+}
+
+.info p{
+    margin:5px 0;
+}
+
+.available{
+    color:green;
+    font-weight:bold;
+}
+
+.book{
+    background:#d90429;
+    color:white;
+    border:none;
+    padding:11px 17px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.book:hover{
+    background:#b80322;
+}
+
+.loading{
+    background:white;
+    padding:35px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 7px 18px rgba(0,0,0,.1);
+}
+
+.loading i{
+    font-size:35px;
+    color:#d90429;
+    margin-bottom:15px;
+}
+
+.no-ambulance{
+    background:white;
+    padding:35px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 7px 18px rgba(0,0,0,.1);
+}
+
+.no-ambulance h3{
+    color:#d90429;
+}
+
+.retry{
+    background:#d90429;
+    color:white;
+    border:none;
+    padding:11px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:15px;
+}
+
+.error-box{
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 7px 18px rgba(0,0,0,.1);
+}
+
+.error-box h3{
+    color:#d90429;
+}
+
+.error-box p{
+    color:#555;
+    margin:15px 0;
+}
+
+@media(max-width:600px){
+
+.ambulance{
+    flex-direction:column;
+    text-align:center;
+    gap:15px;
+}
+
+.info{
+    margin:0;
+}
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>📍 Nearby Ambulances</h1>
+
+<p>Find available emergency ambulances near you</p>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =====================================
+     USER LOCATION
+===================================== -->
+
+<div class="location">
+
+<h2>
+
+<i class="fa-solid fa-location-crosshairs"></i>
+
+Your Location
+
+</h2>
+
+
+<button onclick="findLocation()">
+
+Find Ambulances Near Me
+
+</button>
+
+
+<p id="locationStatus">
+
+Location not detected
+
+</p>
+
+</div>
+
+
+<!-- =====================================
+     AMBULANCE LIST
+===================================== -->
+
+<div class="ambulances" id="ambulanceList">
+
+<!-- Real ambulances will appear here -->
+
+</div>
+
+
+</div>
+
+
+<a href="ambulance.html"
+style="
+display:block;
+text-align:center;
+margin:25px;
+color:#d90429;
+font-weight:bold;
+text-decoration:none;
+">
+
+← Back to Ambulance Service
+
+</a>
+
+
+
+<script>
+
+
+/* =========================================
+   BACKEND API
+========================================= */
+
+const API_URL =
+    "http://localhost/Healthcare%20Drivers/find_nearby_ambulances.php";
+
+
+/* =========================================
+   USER LOCATION
+========================================= */
+
+let userLatitude = null;
+
+let userLongitude = null;
+
+
+/* =========================================
+   PAGE LOAD
+========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        findLocation();
+
+    }
+);
+
+
+/* =========================================
+   FIND LOCATION
+========================================= */
+
+function findLocation(){
+
+    const status =
+        document.getElementById(
+            "locationStatus"
+        );
+
+
+    status.innerText =
+        "Getting your location...";
+
+
+    showLoading();
+
+
+    if(!navigator.geolocation){
+
+        showError(
+            "GPS is not supported by your browser."
+        );
+
+        return;
+    }
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position){
+
+            userLatitude =
+                position.coords.latitude;
+
+
+            userLongitude =
+                position.coords.longitude;
+
+
+            console.log(
+                "User Location:",
+                userLatitude,
+                userLongitude
+            );
+
+
+            status.innerText =
+                "Location detected. Searching nearby ambulances...";
+
+
+            searchNearbyAmbulances();
+
+        },
+
+
+        function(error){
+
+            console.error(
+                "GPS Error:",
+                error
+            );
+
+
+            status.innerText =
+                "Location not detected";
+
+
+            showError(
+                "Please allow location access and try again."
+            );
+
+        },
+
+
+        {
+            enableHighAccuracy:true,
+
+            timeout:15000,
+
+            maximumAge:0
+
+        }
+
+    );
+
+}
+
+
+/* =========================================
+   SEARCH NEARBY AMBULANCES
+========================================= */
+
+async function searchNearbyAmbulances(){
+
+    try{
+
+
+        console.log(
+            "Sending location to backend..."
+        );
+
+
+        const response =
+            await fetch(
+
+                API_URL,
+
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        latitude:
+                        userLatitude,
+
+                        longitude:
+                        userLongitude
+
+                    })
+
+                }
+
+            );
+
+
+        console.log(
+            "HTTP Status:",
+            response.status
+        );
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Backend Response:",
+            result
+        );
+
+
+        if(!result.success){
+
+            showError(
+                result.message ||
+                "Unable to find ambulances."
+            );
+
+            return;
+        }
+
+
+        displayAmbulances(
+            result.ambulances || []
+        );
+
+
+    }
+
+    catch(error){
+
+        console.error(
+            "Connection Error:",
+            error
+        );
+
+
+        showError(
+
+            "Unable to connect to ambulance server. " +
+            "Please make sure XAMPP Apache and MySQL are running."
+
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   DISPLAY REAL AMBULANCES
+========================================= */
+
+function displayAmbulances(ambulances){
+
+    const container =
+        document.getElementById(
+            "ambulanceList"
+        );
+
+
+    if(!container){
+
+        console.error(
+            "ambulanceList element not found."
+        );
+
+        return;
+    }
+
+
+    /* Clear old/fake cards */
+
+    container.innerHTML = "";
+
+
+    /* =====================================
+       NO AMBULANCES
+    ===================================== */
+
+    if(
+        !ambulances ||
+        ambulances.length === 0
+    ){
+
+        container.innerHTML = `
+
+            <div class="no-ambulance">
+
+                <h3>
+                    🚑 No Ambulances Nearby
+                </h3>
+
+                <p>
+                    No verified online ambulances
+                    are currently available near
+                    your location.
+                </p>
+
+                <button
+                    class="retry"
+                    onclick="findLocation()">
+
+                    🔄 Search Again
+
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    /* =====================================
+       CREATE CARDS
+    ===================================== */
+
+    ambulances.forEach(
+        function(ambulance){
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "ambulance";
+
+
+            card.innerHTML = `
+
+                <i class="fa-solid fa-truck-medical"></i>
+
+
+                <div class="info">
+
+                    <h3>
+
+                        🚑
+                        ${escapeHTML(
+                            ambulance.ambulance_number
+                        )}
+
+                    </h3>
+
+
+                    <p>
+
+                        👨‍✈️ Driver:
+
+                        <strong>
+
+                            ${escapeHTML(
+                                ambulance.driver_name
+                            )}
+
+                        </strong>
+
+                    </p>
+
+
+                    <p>
+
+                        🏥
+
+                        ${escapeHTML(
+                            ambulance.ambulance_type
+                        )}
+
+                    </p>
+
+
+                    <p>
+
+                        📍
+
+                        ${ambulance.distance_km}
+
+                        km away
+
+                    </p>
+
+
+                    <p>
+
+                        ⭐ Experience:
+
+                        ${ambulance.experience_years}
+
+                        years
+
+                    </p>
+
+
+                    <span class="available">
+
+                        ● Available
+
+                    </span>
+
+                </div>
+
+
+                <button
+                    class="book"
+                    onclick="bookAmbulance(
+                        ${ambulance.id}
+                    )">
+
+                    Book Now
+
+                </button>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   BOOK AMBULANCE
+========================================= */
+
+function bookAmbulance(driverId){
+
+    if(
+        !userLatitude ||
+        !userLongitude
+    ){
+
+        alert(
+            "Please detect your location first."
+        );
+
+        return;
+    }
+
+
+    localStorage.setItem(
+        "selected_driver_id",
+        driverId
+    );
+
+
+    localStorage.setItem(
+        "user_latitude",
+        userLatitude
+    );
+
+
+    localStorage.setItem(
+        "user_longitude",
+        userLongitude
+    );
+
+
+    console.log(
+        "Selected Driver:",
+        driverId
+    );
+
+
+    window.location.href =
+        "book_ambulance.html";
+
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+function showLoading(){
+
+    const container =
+        document.getElementById(
+            "ambulanceList"
+        );
+
+
+    if(!container) return;
+
+
+    container.innerHTML = `
+
+        <div class="loading">
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <h3>
+
+                Finding nearby ambulances...
+
+            </h3>
+
+            <p>
+
+                Getting your location and
+                searching available drivers.
+
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+function showError(message){
+
+    const container =
+        document.getElementById(
+            "ambulanceList"
+        );
+
+
+    if(!container) return;
+
+
+    container.innerHTML = `
+
+        <div class="error-box">
+
+            <h3>
+
+                ⚠️ Unable to Find Ambulance
+
+            </h3>
+
+
+            <p>
+
+                ${escapeHTML(message)}
+
+            </p>
+
+
+            <button
+                class="retry"
+                onclick="findLocation()">
+
+                🔄 Try Again
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================
+   HTML SECURITY
+========================================= */
+
+function escapeHTML(value){
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

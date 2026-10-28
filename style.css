@@ -1,0 +1,146 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#dff6ff,#ffffff);
+}
+
+header{
+    background:#d90429;
+    color:white;
+    text-align:center;
+    padding:30px;
+}
+
+header h1{
+    font-size:38px;
+}
+
+header p{
+    margin-top:10px;
+    font-size:18px;
+}
+
+.container{
+    width:90%;
+    max-width:1100px;
+    margin:50px auto;
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:30px;
+}
+
+.card{
+    background:white;
+    text-decoration:none;
+    color:#222;
+
+    border-radius:20px;
+    padding:35px;
+
+    text-align:center;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+}
+
+.card i{
+    font-size:60px;
+    color:#d90429;
+    margin-bottom:20px;
+}
+
+.card h2{
+    margin-bottom:15px;
+}
+
+.card p{
+    color:#555;
+}
+
+footer{
+    margin-top:40px;
+    padding:20px;
+    text-align:center;
+    background:#d90429;
+    color:white;
+}
+
+/* Pharmacy Result Improvements */
+
+.result-title {
+    margin: 25px 0 15px;
+    color: #1f2937;
+    font-size: 22px;
+}
+
+.pharmacy-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
+}
+
+.pharmacy-card h3 {
+    margin-bottom: 12px;
+    color: #111827;
+    font-size: 20px;
+}
+
+.details p {
+    margin: 8px 0;
+    color: #4b5563;
+}
+
+.open {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.closed {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.available {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.navigate {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.navigate:hover {
+    background: #1d4ed8;
+}
+
+.no-results {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 20px;
+}

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Track Ambulance</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+<style>
+
+.track-container{
+    width:90%;
+    max-width:800px;
+    margin:35px auto;
+}
+
+.track-box{
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.track-box h2{
+    text-align:center;
+    color:#d90429;
+    margin-bottom:25px;
+}
+
+
+/* STATUS */
+
+.status-box{
+    text-align:center;
+    padding:20px;
+    background:#fff4f4;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+.status-box h3{
+    color:#d90429;
+    margin-bottom:8px;
+}
+
+.status-box p{
+    color:#666;
+}
+
+
+/* DRIVER */
+
+.driver-box{
+    display:none;
+    background:#f7f9fc;
+    padding:20px;
+    border-radius:12px;
+    margin-top:20px;
+}
+
+.driver-box h3{
+    color:#d90429;
+    margin-bottom:15px;
+}
+
+.driver-detail{
+    padding:10px 0;
+    border-bottom:1px solid #ddd;
+}
+
+.driver-detail:last-child{
+    border-bottom:none;
+}
+
+
+/* MAP */
+
+.map-box{
+    display:none;
+    margin-top:20px;
+}
+
+.map-box h3{
+    margin-bottom:12px;
+}
+
+.map{
+    height:300px;
+    background:#e8eef5;
+    border-radius:12px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    color:#555;
+}
+
+
+/* CALL */
+
+.call-btn{
+    display:block;
+    margin-top:15px;
+    text-align:center;
+    background:#168b35;
+    color:white;
+    padding:13px;
+    border-radius:9px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+
+/* REFRESH */
+
+.refresh-btn{
+    width:100%;
+    margin-top:20px;
+    padding:13px;
+    border:none;
+    background:#111;
+    color:white;
+    border-radius:9px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+
+/* BACK */
+
+.back-btn{
+    display:block;
+    text-align:center;
+    margin-top:20px;
+    color:#d90429;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+
+/* ERROR */
+
+.error{
+    display:none;
+    background:#ffe5e5;
+    color:#c00000;
+    padding:15px;
+    border-radius:10px;
+    margin-top:15px;
+    text-align:center;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>🚑 Track Ambulance</h1>
+
+<p>Real-Time Ambulance Tracking</p>
+
+</header>
+
+
+<div class="track-container">
+
+<div class="track-box">
+
+
+<h2>
+
+<i class="fa-solid fa-location-dot"></i>
+
+Ambulance Tracking
+
+</h2>
+
+
+<!-- BOOKING STATUS -->
+
+<div class="status-box">
+
+<h3 id="statusText">
+
+🔍 Searching for ambulance...
+
+</h3>
+
+<p id="statusMessage">
+
+Please wait while we connect you with the ambulance.
+
+</p>
+
+</div>
+
+
+<!-- DRIVER INFORMATION -->
+
+<div
+class="driver-box"
+id="driverBox">
+
+<h3>
+
+🚑 Driver Details
+
+</h3>
+
+
+<div class="driver-detail">
+
+<strong>
+Driver:
+</strong>
+
+<span id="driverName">
+-
+</span>
+
+</div>
+
+
+<div class="driver-detail">
+
+<strong>
+Ambulance:
+</strong>
+
+<span id="ambulanceNumber">
+-
+</span>
+
+</div>
+
+
+<div class="driver-detail">
+
+<strong>
+Type:
+</strong>
+
+<span id="ambulanceType">
+-
+</span>
+
+</div>
+
+
+<div class="driver-detail">
+
+<strong>
+Driver Status:
+</strong>
+
+<span id="driverStatus">
+-
+</span>
+
+</div>
+
+
+<a
+id="callDriver"
+class="call-btn"
+href="#">
+
+📞 Call Driver
+
+</a>
+
+</div>
+
+
+<!-- MAP -->
+
+<div
+class="map-box"
+id="mapBox">
+
+<h3>
+📍 Live Location
+</h3>
+
+
+<div class="map">
+
+<div>
+
+🚑
+
+<p id="mapText">
+
+Waiting for driver's GPS location...
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ERROR -->
+
+<div
+class="error"
+id="errorBox">
+
+Unable to load booking information.
+
+</div>
+
+
+<button
+class="refresh-btn"
+onclick="loadBooking()">
+
+🔄 Refresh Status
+
+</button>
+
+
+<a
+href="ambulance.html"
+class="back-btn">
+
+← Back to Ambulance Service
+
+</a>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* =========================================
+   VARIABLES
+========================================= */
+
+const bookingId =
+    localStorage.getItem(
+        "booking_id"
+    );
+
+
+let trackingTimer = null;
+
+
+/* =========================================
+   CHECK BOOKING
+========================================= */
+
+if(!bookingId){
+
+    document.getElementById(
+        "errorBox"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "errorBox"
+    ).innerText =
+        "No active ambulance booking found.";
+
+}
+
+
+/* =========================================
+   LOAD BOOKING
+========================================= */
+
+async function loadBooking(){
+
+    if(!bookingId){
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "http://localhost/Healthcare%20Drivers/get_booking_details.php",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        booking_id:
+                            parseInt(
+                                bookingId
+                            )
+
+                    })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "BOOKING:",
+            result
+        );
+
+
+        if(!result.success){
+
+            showError(
+                result.message ||
+                "Unable to load booking."
+            );
+
+            return;
+
+        }
+
+
+        hideError();
+
+
+        const booking =
+            result.booking;
+
+
+        const driver =
+            result.driver;
+
+
+        /* =========================
+           UPDATE STATUS
+        ========================= */
+
+        updateStatus(
+            booking.status
+        );
+
+
+        /* =========================
+           DRIVER
+        ========================= */
+
+        if(driver){
+
+            showDriver(
+                driver
+            );
+
+        }
+
+
+    }
+    catch(error){
+
+        console.error(
+            "TRACKING ERROR:",
+            error
+        );
+
+
+        showError(
+            "Unable to connect to ambulance server."
+        );
+
+    }
+
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+function updateStatus(
+    status
+){
+
+    const statusText =
+        document.getElementById(
+            "statusText"
+        );
+
+
+    const statusMessage =
+        document.getElementById(
+            "statusMessage"
+        );
+
+
+    switch(status){
+
+        case "searching":
+
+            statusText.innerText =
+                "🔍 Searching for ambulance...";
+
+            statusMessage.innerText =
+                "Your request has been sent to the selected ambulance.";
+
+            break;
+
+
+        case "accepted":
+
+            statusText.innerText =
+                "✅ Ambulance Accepted";
+
+            statusMessage.innerText =
+                "The ambulance driver has accepted your request.";
+
+            break;
+
+
+        case "arriving":
+
+            statusText.innerText =
+                "🚑 Ambulance is Arriving";
+
+            statusMessage.innerText =
+                "Your ambulance is on the way.";
+
+            break;
+
+
+        case "picked_up":
+
+            statusText.innerText =
+                "🚑 Patient Picked Up";
+
+            statusMessage.innerText =
+                "The patient has been picked up.";
+
+            break;
+
+
+        case "completed":
+
+            statusText.innerText =
+                "🏥 Trip Completed";
+
+            statusMessage.innerText =
+                "The ambulance trip has been completed.";
+
+            stopTracking();
+
+            break;
+
+
+        default:
+
+            statusText.innerText =
+                "🚑 Booking Status: " +
+                status;
+
+    }
+
+}
+
+
+/* =========================================
+   SHOW DRIVER
+========================================= */
+
+function showDriver(
+    driver
+){
+
+    const driverBox =
+        document.getElementById(
+            "driverBox"
+        );
+
+
+    driverBox.style.display =
+        "block";
+
+
+    document.getElementById(
+        "driverName"
+    ).innerText =
+        driver.name ||
+        "-";
+
+
+    document.getElementById(
+        "ambulanceNumber"
+    ).innerText =
+        driver.ambulance_number ||
+        "-";
+
+
+    document.getElementById(
+        "ambulanceType"
+    ).innerText =
+        driver.ambulance_type ||
+        "-";
+
+
+    document.getElementById(
+        "driverStatus"
+    ).innerText =
+        driver.status ||
+        "-";
+
+
+    if(driver.phone){
+
+        document.getElementById(
+            "callDriver"
+        ).href =
+            "tel:" +
+            driver.phone;
+
+    }
+
+
+    /* =========================
+       DRIVER GPS
+    ========================= */
+
+    if(
+        driver.latitude !== null &&
+        driver.longitude !== null
+    ){
+
+        document.getElementById(
+            "mapBox"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "mapText"
+        ).innerHTML =
+
+            "🚑 Driver Location<br><br>" +
+
+            "Latitude: " +
+            Number(
+                driver.latitude
+            ).toFixed(6) +
+
+            "<br>" +
+
+            "Longitude: " +
+            Number(
+                driver.longitude
+            ).toFixed(6);
+
+    }
+
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+function showError(
+    message
+){
+
+    const box =
+        document.getElementById(
+            "errorBox"
+        );
+
+
+    box.innerText =
+        message;
+
+
+    box.style.display =
+        "block";
+
+}
+
+
+function hideError(){
+
+    document.getElementById(
+        "errorBox"
+    ).style.display =
+        "none";
+
+}
+
+
+/* =========================================
+   AUTO TRACKING
+========================================= */
+
+function startTracking(){
+
+    if(trackingTimer !== null){
+
+        return;
+
+    }
+
+
+    trackingTimer =
+        setInterval(
+            loadBooking,
+            5000
+        );
+
+}
+
+
+function stopTracking(){
+
+    if(trackingTimer !== null){
+
+        clearInterval(
+            trackingTimer
+        );
+
+        trackingTimer =
+            null;
+
+    }
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadBooking();
+
+startTracking();
+
+
+</script>
+
+
+</body>
+
+</html>

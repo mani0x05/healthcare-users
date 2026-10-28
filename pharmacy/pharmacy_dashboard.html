@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pharmacy Dashboard</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    color: #222;
+}
+
+header {
+    background: #0b7a75;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 6px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 30px auto;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+.card h2 {
+    margin-bottom: 20px;
+    color: #0b7a75;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.save-btn {
+    background: #0b7a75;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #095f5b;
+}
+
+.clear-btn {
+    background: #e74c3c;
+    color: white;
+    margin-left: 8px;
+}
+
+.home-btn {
+    background: #333;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.message {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th,
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background: #eaf5f4;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    padding: 8px 12px;
+    margin: 0;
+}
+
+@media(max-width:700px) {
+
+    .container {
+        width: 95%;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+    th,
+    td {
+        padding: 8px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<header>
+
+    <h1>💊 Pharmacy Partner Dashboard</h1>
+
+    <p>Manage your pharmacy medicine inventory</p>
+
+</header>
+
+
+<div class="container">
+
+    <button class="home-btn" onclick="goToPharmacy()">
+        ← Pharmacy Near Me
+    </button>
+
+
+    <!-- PHARMACY SELECTION -->
+
+    <div class="card">
+
+        <h2>Pharmacy Details</h2>
+
+        <label>Select Pharmacy</label>
+
+        <select id="pharmacySelect" onchange="loadSelectedPharmacy()">
+
+            <option value="apollo">
+                Apollo Pharmacy
+            </option>
+
+            <option value="medplus">
+                MedPlus Pharmacy
+            </option>
+
+            <option value="sri-sai">
+                Sri Sai Medicals
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ADD MEDICINE -->
+
+    <div class="card">
+
+        <h2>Add / Update Medicine</h2>
+
+        <label>Medicine Name</label>
+
+        <input
+            type="text"
+            id="medicineName"
+            placeholder="Example: Dolo 650"
+        >
+
+
+        <label>Quantity</label>
+
+        <input
+            type="number"
+            id="medicineQuantity"
+            min="0"
+            placeholder="Example: 20"
+        >
+
+
+        <label>Price (₹)</label>
+
+        <input
+            type="number"
+            id="medicinePrice"
+            min="0"
+            step="0.01"
+            placeholder="Example: 35"
+        >
+
+
+        <button
+            class="save-btn"
+            onclick="saveMedicine()"
+        >
+            Add / Update Medicine
+        </button>
+
+
+        <button
+            class="clear-btn"
+            onclick="clearForm()"
+        >
+            Clear
+        </button>
+
+
+        <div
+            class="message"
+            id="message"
+        ></div>
+
+    </div>
+
+
+    <!-- INVENTORY -->
+
+    <div class="card">
+
+        <h2 id="inventoryTitle">
+            Current Inventory
+        </h2>
+
+        <div id="inventoryTable"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   DEFAULT PHARMACY DATA
+===================================================== */
+
+const defaultInventories = {
+
+    "apollo": {
+
+        "paracetamol": {
+            displayName: "Paracetamol",
+            quantity: 25,
+            price: 30
+        },
+
+        "cetirizine": {
+            displayName: "Cetirizine",
+            quantity: 10,
+            price: 20
+        },
+
+        "dolo 650": {
+            displayName: "Dolo 650",
+            quantity: 15,
+            price: 35
+        }
+
+    },
+
+
+    "medplus": {
+
+        "paracetamol": {
+            displayName: "Paracetamol",
+            quantity: 10,
+            price: 28
+        },
+
+        "azithromycin": {
+            displayName: "Azithromycin",
+            quantity: 8,
+            price: 50
+        },
+
+        "cetirizine": {
+            displayName: "Cetirizine",
+            quantity: 20,
+            price: 18
+        }
+
+    },
+
+
+    "sri-sai": {
+
+        "paracetamol": {
+            displayName: "Paracetamol",
+            quantity: 5,
+            price: 25
+        },
+
+        "dolo 650": {
+            displayName: "Dolo 650",
+            quantity: 12,
+            price: 32
+        },
+
+        "azithromycin": {
+            displayName: "Azithromycin",
+            quantity: 6,
+            price: 48
+        }
+
+    }
+
+};
+
+
+/* =====================================================
+   LOAD INVENTORY
+===================================================== */
+
+function getInventories() {
+
+    const saved =
+        localStorage.getItem("pharmacyInventories");
+
+    if (saved) {
+
+        try {
+
+            return JSON.parse(saved);
+
+        } catch (error) {
+
+            console.log(
+                "Inventory data corrupted. Resetting."
+            );
+
+        }
+
+    }
+
+
+    localStorage.setItem(
+        "pharmacyInventories",
+        JSON.stringify(defaultInventories)
+    );
+
+    return JSON.parse(
+        JSON.stringify(defaultInventories)
+    );
+}
+
+
+/* =====================================================
+   SAVE ALL INVENTORIES
+===================================================== */
+
+function saveInventories(data) {
+
+    localStorage.setItem(
+        "pharmacyInventories",
+        JSON.stringify(data)
+    );
+
+}
+
+
+/* =====================================================
+   SELECTED PHARMACY
+===================================================== */
+
+let selectedPharmacy =
+    document.getElementById("pharmacySelect").value;
+
+
+/* =====================================================
+   LOAD SELECTED PHARMACY
+===================================================== */
+
+function loadSelectedPharmacy() {
+
+    selectedPharmacy =
+        document.getElementById("pharmacySelect").value;
+
+    clearForm();
+
+    displayInventory();
+
+}
+
+
+/* =====================================================
+   SAVE MEDICINE
+===================================================== */
+
+function saveMedicine() {
+
+    const name =
+        document
+        .getElementById("medicineName")
+        .value
+        .trim();
+
+
+    const quantity =
+        Number(
+            document
+            .getElementById("medicineQuantity")
+            .value
+        );
+
+
+    const price =
+        Number(
+            document
+            .getElementById("medicinePrice")
+            .value
+        );
+
+
+    const message =
+        document.getElementById("message");
+
+
+    if (!name) {
+
+        message.innerText =
+            "Please enter medicine name.";
+
+        message.style.color = "red";
+
+        return;
+
+    }
+
+
+    if (isNaN(quantity) || quantity < 0) {
+
+        message.innerText =
+            "Please enter a valid quantity.";
+
+        message.style.color = "red";
+
+        return;
+
+    }
+
+
+    if (isNaN(price) || price < 0) {
+
+        message.innerText =
+            "Please enter a valid price.";
+
+        message.style.color = "red";
+
+        return;
+
+    }
+
+
+    const inventories =
+        getInventories();
+
+
+    if (!inventories[selectedPharmacy]) {
+
+        inventories[selectedPharmacy] = {};
+
+    }
+
+
+    const key =
+        name
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+
+
+    inventories[selectedPharmacy][key] = {
+
+        displayName:
+            name
+            .split(" ")
+            .map(
+                word =>
+                    word.charAt(0).toUpperCase() +
+                    word.slice(1)
+            )
+            .join(" "),
+
+        quantity: quantity,
+
+        price: price
+
+    };
+
+
+    saveInventories(inventories);
+
+
+    message.innerText =
+        "Medicine saved successfully!";
+
+    message.style.color = "green";
+
+
+    clearInputsOnly();
+
+    displayInventory();
+
+}
+
+
+/* =====================================================
+   DISPLAY INVENTORY
+===================================================== */
+
+function displayInventory() {
+
+    const inventories =
+        getInventories();
+
+
+    const inventory =
+        inventories[selectedPharmacy] || {};
+
+
+    const pharmacyName =
+        document
+        .getElementById("pharmacySelect")
+        .options[
+            document.getElementById("pharmacySelect").selectedIndex
+        ]
+        .text;
+
+
+    document.getElementById(
+        "inventoryTitle"
+    ).innerText =
+        pharmacyName + " - Current Inventory";
+
+
+    const tableContainer =
+        document.getElementById("inventoryTable");
+
+
+    const medicines =
+        Object.keys(inventory);
+
+
+    if (medicines.length === 0) {
+
+        tableContainer.innerHTML =
+            "<p>No medicines added yet.</p>";
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <table>
+
+            <tr>
+
+                <th>Medicine</th>
+
+                <th>Quantity</th>
+
+                <th>Price</th>
+
+                <th>Stock Status</th>
+
+                <th>Action</th>
+
+            </tr>
+
+    `;
+
+
+    medicines.forEach(key => {
+
+        const medicine =
+            inventory[key];
+
+
+        const status =
+            medicine.quantity > 0
+            ? "Available"
+            : "Out of Stock";
+
+
+        html += `
+
+            <tr>
+
+                <td>
+                    ${medicine.displayName}
+                </td>
+
+                <td>
+                    ${medicine.quantity}
+                </td>
+
+                <td>
+                    ₹${medicine.price}
+                </td>
+
+                <td>
+                    ${status}
+                </td>
+
+                <td>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteMedicine('${key}')"
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    html += "</table>";
+
+
+    tableContainer.innerHTML = html;
+
+}
+
+
+/* =====================================================
+   DELETE MEDICINE
+===================================================== */
+
+function deleteMedicine(key) {
+
+    const inventories =
+        getInventories();
+
+
+    if (
+        !inventories[selectedPharmacy] ||
+        !inventories[selectedPharmacy][key]
+    ) {
+
+        return;
+
+    }
+
+
+    const medicineName =
+        inventories[
+            selectedPharmacy
+        ][key].displayName;
+
+
+    const confirmDelete =
+        confirm(
+            "Delete " + medicineName + "?"
+        );
+
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+
+    delete inventories[
+        selectedPharmacy
+    ][key];
+
+
+    saveInventories(inventories);
+
+
+    displayInventory();
+
+}
+
+
+/* =====================================================
+   CLEAR FORM
+===================================================== */
+
+function clearInputsOnly() {
+
+    document.getElementById(
+        "medicineName"
+    ).value = "";
+
+    document.getElementById(
+        "medicineQuantity"
+    ).value = "";
+
+    document.getElementById(
+        "medicinePrice"
+    ).value = "";
+
+}
+
+
+function clearForm() {
+
+    clearInputsOnly();
+
+    document.getElementById(
+        "message"
+    ).innerText = "";
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function goToPharmacy() {
+
+    window.location.href =
+        "pharmacy.html";
+
+}
+
+
+/* =====================================================
+   INITIAL LOAD
+===================================================== */
+
+displayInventory();
+
+</script>
+
+</body>
+
+</html>

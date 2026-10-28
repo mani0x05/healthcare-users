@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /HEALTHCARE/
+
+# Emergency SOS API Routes
+RewriteRule ^api/sos/trigger/?$ api/sos/trigger.php [QSA,L]
+RewriteRule ^api/sos/location/([^/]+)/?$ api/sos/location.php?sessionId=$1 [QSA,L]
+RewriteRule ^api/sos/location/?$ api/sos/location.php [QSA,L]
+RewriteRule ^api/sos/complete/([^/]+)/?$ api/sos/complete.php?sessionId=$1 [QSA,L]
+RewriteRule ^api/sos/complete/?$ api/sos/complete.php [QSA,L]

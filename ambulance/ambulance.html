@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ambulance Service | Emergency Healthcare Assistance</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f7fb;
+        }
+
+        /* Emergency Hero */
+
+        .emergency-hero {
+            width: 90%;
+            max-width: 1100px;
+            margin: 35px auto 20px;
+            background: linear-gradient(135deg, #d90429, #ef233c);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .18);
+        }
+
+        .emergency-hero i {
+            font-size: 45px;
+            margin-bottom: 12px;
+        }
+
+        .emergency-hero h2 {
+            margin: 5px 0 10px;
+            font-size: 28px;
+        }
+
+        .emergency-hero p {
+            margin: 0 auto 20px;
+            max-width: 650px;
+            line-height: 1.6;
+        }
+
+        .emergency-button {
+            display: inline-block;
+            background: white;
+            color: #d90429;
+            padding: 14px 28px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 17px;
+            transition: .3s;
+        }
+
+        .emergency-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Main Cards */
+
+        .ambulance-container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 28px;
+        }
+
+        .ambulance-card {
+            background: #fff;
+            color: #222;
+            text-decoration: none;
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
+            transition: .3s;
+            border-top: 5px solid #d90429;
+        }
+
+        .ambulance-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, .25);
+        }
+
+        .ambulance-card i {
+            font-size: 55px;
+            color: #d90429;
+            margin-bottom: 18px;
+        }
+
+        .ambulance-card h2 {
+            margin-bottom: 12px;
+            font-size: 23px;
+        }
+
+        .ambulance-card p {
+            color: #555;
+            line-height: 1.5;
+            min-height: 48px;
+        }
+
+        .card-button {
+            display: inline-block;
+            background: #d90429;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        /* How It Works */
+
+        .how-it-works {
+            width: 90%;
+            max-width: 1100px;
+            margin: 45px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .10);
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .step-number {
+            width: 45px;
+            height: 45px;
+            margin: 0 auto 12px;
+            background: #d90429;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .step h3 {
+            margin: 10px 0;
+        }
+
+        .step p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Emergency Note */
+
+        .emergency-note {
+            width: 90%;
+            max-width: 1100px;
+            margin: 20px auto;
+            background: #fff;
+            border-left: 6px solid #d90429;
+            padding: 18px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .10);
+            text-align: center;
+        }
+
+        .back-home {
+            display: block;
+            width: fit-content;
+            margin: 30px auto;
+            color: #d90429;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 600px) {
+
+            header h1 {
+                font-size: 30px;
+            }
+
+            .emergency-hero {
+                padding: 25px 18px;
+            }
+
+            .emergency-hero h2 {
+                font-size: 23px;
+            }
+
+            .ambulance-card {
+                padding: 28px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+
+        <h1>🚑 Ambulance Service</h1>
+
+        <p>
+            Fast and Reliable Emergency Ambulance Assistance
+        </p>
+
+    </header>
+
+
+    <!-- ================= EMERGENCY SECTION ================= -->
+
+    <div class="emergency-hero">
+
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <h2>Accident or Medical Emergency?</h2>
+
+        <p>
+            Get the nearest available ambulance from your current location.
+            Request emergency transportation quickly and safely.
+        </p>
+
+        <a href="book_ambulance.html?emergency=accident" class="emergency-button">
+
+            <i class="fa-solid fa-truck-medical"></i>
+            Book Emergency Ambulance
+
+        </a>
+
+    </div>
+
+
+    <!-- ================= INFORMATION ================= -->
+
+    <div class="emergency-note">
+
+        <strong>🚨 Emergency Assistance</strong>
+
+        <br>
+
+        Select an option below to find or book an ambulance.
+
+    </div>
+
+
+    <!-- ================= AMBULANCE OPTIONS ================= -->
+
+    <div class="ambulance-container">
+
+
+        <!-- FIND NEARBY -->
+
+        <a href="find_ambulance.html" class="ambulance-card">
+
+            <i class="fa-solid fa-location-crosshairs"></i>
+
+            <h2>
+                Find Nearby Ambulance
+            </h2>
+
+            <p>
+                Find available ambulances near your current GPS location
+                and check their estimated arrival time.
+            </p>
+
+            <span class="card-button">
+                Find Ambulance
+            </span>
+
+        </a>
+
+
+<!-- MY BOOKINGS -->
+
+<a href="my_bookings.html" class="ambulance-card">
+
+    <i class="fa-solid fa-clipboard-list"></i>
+
+    <h2>
+        My Bookings
+    </h2>
+
+    <p>
+        View your ambulance booking details,
+        booking status, driver and ambulance information.
+    </p>
+
+    <span class="card-button">
+        View Bookings
+    </span>
+
+</a>
+
+
+
+        <!-- TRACK AMBULANCE -->
+
+        <a href="track_ambulance.html" class="ambulance-card">
+
+            <i class="fa-solid fa-map-location-dot"></i>
+
+            <h2>
+                Track Ambulance
+            </h2>
+
+            <p>
+                Track your booked ambulance and view its current
+                emergency response status.
+            </p>
+
+            <span class="card-button">
+                Track Now
+            </span>
+
+        </a>
+
+    </div>
+
+
+
+    <!-- ================= HOW IT WORKS ================= -->
+
+    <div class="how-it-works">
+
+        <h2>
+            🚑 How Ambulance Booking Works
+        </h2>
+
+        <div class="steps">
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <h3>
+                    Share Location
+                </h3>
+
+                <p>
+                    Your current location is detected using GPS.
+                </p>
+
+            </div>
+
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <h3>
+                    Find Ambulance
+                </h3>
+
+                <p>
+                    The system identifies nearby available ambulances.
+                </p>
+
+            </div>
+
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <h3>
+                    Book
+                </h3>
+
+                <p>
+                    Select an ambulance and send an emergency request.
+                </p>
+
+            </div>
+
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    4
+                </div>
+
+                <h3>
+                    Track
+                </h3>
+
+                <p>
+                    Monitor ambulance status until it reaches you.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <a href="index.html" class="back-home">
+
+        ← Back to Emergency Healthcare Home
+
+    </a>
+
+
+    <footer>
+
+        © 2026 Emergency Healthcare Assistance
+
+    </footer>
+
+
+</body>
+
+</html>
